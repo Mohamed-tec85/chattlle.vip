@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>CHATTLLE · لوحة التحكم</title>
+<style>
+  :root{
+    --noir:#0a0f0c; --panel:#11161300; --panel-2:#131a16; --line:rgba(199,162,74,.22);
+    --gold:#c7a24a; --gold-soft:#e0c984; --emerald:#2da379; --cream:#f0ece0; --muted:#8f9a8f;
+    --danger:#c0506a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:
+      radial-gradient(70% 50% at 50% 0%,rgba(45,163,121,.10),transparent 60%),
+      var(--noir);
+    color:var(--cream);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.6;min-height:100vh}
+  a{color:var(--gold-soft)}
+  h1,h2,h3{font-weight:500;letter-spacing:.02em}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 18px 80px}
+
+  /* top bar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border-bottom:1px solid var(--line);padding:16px 0;margin-bottom:24px;flex-wrap:wrap}
+  .brand{font-size:22px;letter-spacing:.18em;color:var(--gold-soft)}
+  .brand small{display:block;font-size:11px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
+  .topbar .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  /* buttons */
+  button{font-family:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--line);
+    background:transparent;color:var(--cream);padding:10px 16px;font-size:14px;transition:all .2s}
+  button:hover{border-color:var(--gold)}
+  .btn-gold{background:var(--gold);color:var(--noir);border-color:var(--gold);font-weight:600}
+  .btn-gold:hover{background:var(--gold-soft);border-color:var(--gold-soft)}
+  .btn-danger{border-color:rgba(192,80,106,.5);color:#e79bab}
+  .btn-danger:hover{border-color:var(--danger);background:rgba(192,80,106,.12)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  /* login */
+  #login{max-width:380px;margin:8vh auto;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;padding:34px 30px}
+  #login h2{margin:0 0 4px;text-align:center;letter-spacing:.16em;color:var(--gold-soft)}
+  #login p{text-align:center;color:var(--muted);margin:0 0 24px;font-size:13px}
+  label{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px;letter-spacing:.04em}
+  input[type=email],input[type=password],input[type=text],input[type=number],textarea{
+    width:100%;background:#0d1310;border:1px solid var(--line);border-radius:6px;color:var(--cream);
+    padding:11px 12px;font-size:14px;font-family:inherit}
+  input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  textarea{min-height:70px;resize:vertical}
+  #login button{width:100%;margin-top:22px}
+  .msg{margin-top:14px;font-size:13px;text-align:center;min-height:18px}
+  .msg.err{color:#e79bab}
+  .msg.ok{color:var(--emerald)}
+
+  /* product list */
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+  .toolbar h2{margin:0;font-size:18px;color:var(--gold-soft);letter-spacing:.06em}
+  details.prod{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+  details.prod[open]{border-color:var(--gold)}
+  summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px 16px}
+  summary::-webkit-details-marker{display:none}
+  .thumb{width:46px;height:60px;border:1px solid var(--line);border-radius:4px;object-fit:cover;background:#0d1310;flex:none}
+  .sum-name{font-size:16px;color:var(--cream)}
+  .sum-sub{font-size:12px;color:var(--muted)}
+  .sum-no{margin-inline-start:auto;font-size:13px;color:var(--gold)}
+  .badge-off{font-size:11px;color:#e79bab;border:1px solid rgba(192,80,106,.4);border-radius:4px;padding:1px 7px;margin-inline-start:8px}
+
+  .body{padding:6px 16px 20px;border-top:1px solid var(--line)}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+  .shared{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end;margin:14px 0}
+  .img-box{display:flex;gap:14px;align-items:center;margin:14px 0;flex-wrap:wrap}
+  .img-box img{width:80px;height:104px;object-fit:cover;border:1px solid var(--line);border-radius:6px;background:#0d1310}
+  .lang-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:6px}
+  .lang-col{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#0d1310}
+  .lang-col h4{margin:0 0 6px;color:var(--gold-soft);font-size:13px;letter-spacing:.1em}
+  .chk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--cream);white-space:nowrap}
+  .chk input{width:18px;height:18px;accent-color:var(--gold)}
+  .save-row{display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap}
+  .save-row .status{font-size:13px}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+
+  @media(max-width:760px){.lang-grid{grid-template-columns:1fr}.shared{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div id="login">
+    <h2>CHATTLLE</h2>
+    <p>لوحة تحكم العطور</p>
+    <label>البريد الإلكتروني</label>
+    <input type="email" id="email" autocomplete="username">
+    <label>كلمة المرور</label>
+    <input type="password" id="password" autocomplete="current-password">
+    <button class="btn-gold" id="loginBtn">تسجيل الدخول</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" style="display:none">
+    <div class="topbar">
+      <div class="brand">CHATTLLE<small>لوحة التحكم</small></div>
+      <div class="actions">
+        <a href="index.html" target="_blank"><button>عرض الموقع ↗</button></a>
+        <button id="logoutBtn">خروج</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <h2>العطور</h2>
+      <button class="btn-gold" id="addBtn">+ إضافة عطر جديد</button>
+    </div>
+    <div id="list"></div>
+  </div>
+
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://ihammjkslfiiitgvokiy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_UwXjwS_FcgagJNUeEOQmIg_gw0t0uEv';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const LANGS = [['fr','Français'],['en','English'],['ar','العربية']];
+const LFIELDS = [['name','الاسم','input'],['type','النوع','input'],['desc','الوصف القصير','textarea'],
+                 ['story','القصّة','textarea'],['top','النوتة العلوية','input'],
+                 ['heart','نوتة القلب','input'],['base','النوتة القاعدية','input']];
+
+const $ = s => document.querySelector(s);
+const loginView = $('#login'), appView = $('#app');
+
+// ---------- AUTH ----------
+async function init(){
+  const { data:{ session } } = await supabase.auth.getSession();
+  showApp(!!session);
+}
+function showApp(on){
+  loginView.style.display = on ? 'none' : 'block';
+  appView.style.display   = on ? 'block' : 'none';
+  if(on) loadProducts();
+}
+$('#loginBtn').addEventListener('click', async ()=>{
+  const msg = $('#loginMsg'); msg.textContent=''; msg.className='msg';
+  const email = $('#email').value.trim(), password = $('#password').value;
+  if(!email || !password){ msg.textContent='أدخل البريد وكلمة المرور'; msg.className='msg err'; return; }
+  $('#loginBtn').disabled = true; $('#loginBtn').textContent='جاري الدخول...';
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  $('#loginBtn').disabled = false; $('#loginBtn').textContent='تسجيل الدخول';
+  if(error){ msg.textContent='فشل الدخول: تأكد من البريد وكلمة المرور'; msg.className='msg err'; return; }
+  showApp(true);
+});
+$('#logoutBtn').addEventListener('click', async ()=>{ await supabase.auth.signOut(); showApp(false); });
+
+// ---------- LOAD ----------
+async function loadProducts(){
+  const list = $('#list');
+  list.innerHTML = '<p style="color:var(--muted)">جاري التحميل...</p>';
+  const { data, error } = await supabase.from('products').select('*').order('sort_order',{ascending:true});
+  if(error){ list.innerHTML = '<p class="msg err">خطأ في التحميل: '+error.message+'</p>'; return; }
+  list.innerHTML = '';
+  data.forEach(p => list.appendChild(panelFor(p)));
+}
+
+// ---------- RENDER ONE PRODUCT ----------
+function panelFor(p){
+  const d = document.createElement('details'); d.className='prod';
+  const langCols = LANGS.map(([code,label])=>`
+    <div class="lang-col">
+      <h4>${label}</h4>
+      ${LFIELDS.map(([f,flabel,tag])=>{
+        const fld = f+'_'+code; const val = (p[fld]??'').toString().replace(/"/g,'&quot;');
+        return `<label>${flabel}</label>`+
+          (tag==='textarea'
+            ? `<textarea data-field="${fld}">${(p[fld]??'')}</textarea>`
+            : `<input type="text" data-field="${fld}" value="${val}">`);
+      }).join('')}
+    </div>`).join('');
+
+  const img = p.image_url ? p.image_url : '';
+  d.innerHTML = `
+    <summary>
+      <img class="thumb" src="${img||''}" alt="" onerror="this.style.visibility='hidden'">
+      <div>
+        <div class="sum-name">${p.name_ar||p.name_fr||'(بدون اسم)'} ${p.active?'':'<span class="badge-off">مخفي</span>'}</div>
+        <div class="sum-sub">${p.name_fr||''}</div>
+      </div>
+      <div class="sum-no">N° ${p.sort_order??''}</div>
+    </summary>
+    <div class="body">
+      <div class="img-box">
+        <img src="${img||''}" alt="" onerror="this.style.visibility='hidden'" data-preview>
+        <div>
+          <label>صورة العطر</label>
+          <input type="file" accept="image/*" data-imgfile>
+          <input type="hidden" data-field="image_url" value="${img.replace(/"/g,'&quot;')}">
+          <div class="hint">اختر صورة لرفعها (تُرفع وتُحفظ فوراً)</div>
+        </div>
+      </div>
+      <div class="shared">
+        <div><label>السعر</label><input type="text" data-field="price" value="${(p.price??'').replace(/"/g,'&quot;')}" placeholder="مثال: 340 €"></div>
+        <div><label>الترتيب (الرقم)</label><input type="number" data-field="sort_order" value="${p.sort_order??0}"></div>
+        <div class="chk"><input type="checkbox" data-field="active" ${p.active?'checked':''}><span>ظاهر في الموقع</span></div>
+      </div>
+      <div class="lang-grid">${langCols}</div>
+      <div class="save-row">
+        <button class="btn-gold" data-save>حفظ التغييرات</button>
+        <button class="btn-danger" data-del>حذف العطر</button>
+        <span class="status" data-status></span>
+      </div>
+    </div>`;
+
+  // image upload
+  d.querySelector('[data-imgfile]').addEventListener('change', e=>uploadImage(e.target.files[0], p.id, d));
+  // save
+  d.querySelector('[data-save]').addEventListener('click', ()=>saveProduct(p.id, d));
+  // delete
+  d.querySelector('[data-del]').addEventListener('click', ()=>delProduct(p.id, p.name_ar||p.name_fr));
+  return d;
+}
+
+// ---------- SAVE ----------
+async function saveProduct(id, panel){
+  const status = panel.querySelector('[data-status]');
+  status.textContent='جاري الحفظ...'; status.style.color='var(--muted)';
+  const payload = { updated_at:new Date().toISOString() };
+  panel.querySelectorAll('[data-field]').forEach(el=>{
+    const f = el.dataset.field;
+    if(el.type==='checkbox') payload[f]=el.checked;
+    else if(el.type==='number') payload[f]= el.value===''?0:Number(el.value);
+    else payload[f]= el.value;
+  });
+  const { error } = await supabase.from('products').update(payload).eq('id', id);
+  if(error){ status.textContent='خطأ: '+error.message; status.style.color='#e79bab'; return; }
+  status.textContent='✓ تم الحفظ'; status.style.color='var(--emerald)';
+  // refresh summary text
+  const nm = panel.querySelector('.sum-name'); if(nm) nm.firstChild.textContent = (payload.name_ar||payload.name_fr||'(بدون اسم)')+' ';
+  setTimeout(()=>{ status.textContent=''; }, 2500);
+}
+
+// ---------- IMAGE UPLOAD ----------
+async function uploadImage(file, id, panel){
+  if(!file) return;
+  const status = panel.querySelector('[data-status]');
+  status.textContent='جاري رفع الصورة...'; status.style.color='var(--muted)';
+  const ext = (file.name.split('.').pop()||'jpg').toLowerCase();
+  const path = `${id}/${Date.now()}.${ext}`;
+  const up = await supabase.storage.from('perfumes').upload(path, file, { upsert:true, contentType:file.type });
+  if(up.error){ status.textContent='خطأ في الرفع: '+up.error.message; status.style.color='#e79bab'; return; }
+  const { data } = supabase.storage.from('perfumes').getPublicUrl(path);
+  const url = data.publicUrl;
+  // set fields + preview, and persist immediately
+  panel.querySelector('[data-field="image_url"]').value = url;
+  const prev = panel.querySelector('[data-preview]'); prev.src=url; prev.style.visibility='visible';
+  const thumb = panel.querySelector('.thumb'); thumb.src=url; thumb.style.visibility='visible';
+  const { error } = await supabase.from('products').update({ image_url:url, updated_at:new Date().toISOString() }).eq('id', id);
+  if(error){ status.textContent='رُفعت الصورة لكن تعذّر الحفظ: '+error.message; status.style.color='#e79bab'; return; }
+  status.textContent='✓ تم رفع الصورة وحفظها'; status.style.color='var(--emerald)';
+  setTimeout(()=>{ status.textContent=''; }, 2500);
+}
+
+// ---------- ADD ----------
+$('#addBtn').addEventListener('click', async ()=>{
+  const { data: rows } = await supabase.from('products').select('sort_order').order('sort_order',{ascending:false}).limit(1);
+  const next = rows && rows.length ? (rows[0].sort_order||0)+1 : 1;
+  const { error } = await supabase.from('products').insert({ sort_order:next, active:true, name_ar:'عطر جديد', name_fr:'Nouveau parfum' });
+  if(error){ alert('خطأ في الإضافة: '+error.message); return; }
+  loadProducts();
+});
+
+// ---------- DELETE ----------
+async function delProduct(id, name){
+  if(!confirm('حذف "'+(name||'هذا العطر')+'" نهائياً؟')) return;
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if(error){ alert('خطأ في الحذف: '+error.message); return; }
+  loadProducts();
+}
+
+init();
+</script>
+</body>
+</html>
