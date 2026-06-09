@@ -104,6 +104,7 @@
         <button class="tab active" data-view="home">الرئيسية</button>
         <button class="tab" data-view="products">المنتجات</button>
         <button class="tab" data-view="pages">الصفحات</button>
+        <button class="tab" data-view="orders">الطلبات</button>
       </div>
       <div class="actions">
         <a href="index.html" target="_blank"><button>عرض الموقع ↗</button></a>
@@ -155,6 +156,15 @@
     </div>
 
     <div id="view-pages" class="hidden"><div id="pagesList"></div></div>
+
+    <div id="view-orders" class="hidden">
+      <div class="dash-head"><h2 style="margin:0;color:var(--gold-soft);font-size:18px">الطلبات</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <select id="orderFilter"><option value="all">كل الحالات</option><option value="placed">جديد</option><option value="shipped">تم الشحن</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option></select>
+          <button id="ordersRefresh">تحديث</button></div>
+      </div>
+      <div id="ordersList"></div>
+    </div>
   </div>
 </div>
 
@@ -174,7 +184,7 @@ async function init(){ const { data:{session} }=await supabase.auth.getSession()
 function showApp(on){
   $('#login').style.display=on?'none':'block';
   $('#app').style.display=on?'block':'none';
-  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadPages(); }
+  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadPages(); loadOrders(); }
 }
 $('#loginBtn').addEventListener('click',async()=>{
   const msg=$('#loginMsg'); msg.textContent=''; msg.className='msg';
@@ -195,8 +205,10 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   $('#view-home').classList.toggle('hidden', v!=='home');
   $('#view-products').classList.toggle('hidden', v!=='products');
   $('#view-pages').classList.toggle('hidden', v!=='pages');
+  $('#view-orders').classList.toggle('hidden', v!=='orders');
   if(v==='home') loadDashboard();
   if(v==='pages') loadPages();
+  if(v==='orders') loadOrders();
 }));
 
 let chartProd=null, chartTime=null;
@@ -387,6 +399,73 @@ async function savePage(key,panel){
   if(error){ st.textContent='خطأ: '+error.message; st.style.color='#e79bab'; return; }
   st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
 }
+
+const OSTATUS={placed:{l:'جديد',c:'#c7a24a'},shipped:{l:'تم الشحن',c:'#2da379'},completed:{l:'مكتمل',c:'#7fb3a0'},cancelled:{l:'ملغي',c:'#c0506a'}};
+function ostat(s){return OSTATUS[s]||{l:s||'—',c:'#8f9a8f'};}
+function odate(s){try{return new Date(s).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return s||'';}}
+async function loadOrders(){
+  const wrap=$('#ordersList'); wrap.innerHTML='<p style="color:var(--muted)">جاري التحميل...</p>';
+  const filt=$('#orderFilter')?$('#orderFilter').value:'all';
+  let q=supabase.from('orders').select('*').order('created_at',{ascending:false});
+  if(filt!=='all') q=q.eq('status',filt);
+  const { data:orders, error }=await q;
+  if(error){ wrap.innerHTML='<p class="msg err">خطأ: '+error.message+'</p>'; return; }
+  if(!orders||!orders.length){ wrap.innerHTML='<div class="empty">لا توجد طلبات'+(filt!=='all'?' بهذه الحالة':'')+' بعد.</div>'; return; }
+  const ids=orders.map(o=>o.id);
+  const r=await supabase.from('order_items').select('*').in('order_id',ids);
+  const items=r.data||[]; const byOrder={};
+  items.forEach(it=>{(byOrder[it.order_id]=byOrder[it.order_id]||[]).push(it);});
+  wrap.innerHTML=''; orders.forEach(o=>wrap.appendChild(orderPanel(o,byOrder[o.id]||[])));
+}
+function orderPanel(o,items){
+  const d=document.createElement('details'); d.className='prod'; const st=ostat(o.status);
+  const rows=items.map(it=>`<tr><td>${it.product_name||'—'}</td><td>${it.qty}</td><td>${sar(it.unit_price)}</td><td>${sar(it.line_total)}</td></tr>`).join('')
+    || '<tr><td colspan="4" style="color:var(--muted)">لا أصناف مسجّلة</td></tr>';
+  d.innerHTML=`
+    <summary>
+      <div><div class="sum-name">${o.customer_name||'بدون اسم'} <span class="obadge" style="border:1px solid ${st.c};color:${st.c};font-size:11px;border-radius:4px;padding:1px 8px;margin-inline-start:8px">${st.l}</span></div>
+      <div class="sum-sub">${odate(o.created_at)}</div></div>
+      <div class="sum-no">${sar(o.total)}</div>
+    </summary>
+    <div class="body">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px;font-size:14px;color:var(--muted)">
+        <div>البريد: <span style="color:var(--cream)">${o.email||'—'}</span></div>
+        <div>الهاتف: <span style="color:var(--cream)">${o.phone||'—'}</span></div>
+        <div>العنوان: <span style="color:var(--cream)">${o.address||'—'}</span></div>
+        <div>الدفع: <span style="color:var(--cream)">${o.payment_method||'—'}</span></div>
+      </div>
+      <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table>
+      <div style="display:flex;justify-content:flex-end;gap:24px;margin-top:12px;font-size:14px;flex-wrap:wrap">
+        <span style="color:var(--muted)">المجموع الفرعي: <b style="color:var(--cream)">${sar(o.subtotal)}</b></span>
+        <span style="color:var(--muted)">الضريبة: <b style="color:var(--cream)">${sar(o.tax)}</b></span>
+        <span style="color:var(--gold-soft)">الإجمالي: <b>${sar(o.total)}</b></span>
+      </div>
+      <div class="save-row">
+        <label style="margin:0">الحالة</label>
+        <select data-ostatus>
+          <option value="placed"${o.status==='placed'?' selected':''}>جديد</option>
+          <option value="shipped"${o.status==='shipped'?' selected':''}>تم الشحن</option>
+          <option value="completed"${o.status==='completed'?' selected':''}>مكتمل</option>
+          <option value="cancelled"${o.status==='cancelled'?' selected':''}>ملغي</option>
+        </select>
+        <button class="btn-gold" data-savestatus>حفظ الحالة</button>
+        <span class="status" data-status></span>
+      </div>
+    </div>`;
+  d.querySelector('[data-savestatus]').addEventListener('click',()=>changeStatus(o.id,d));
+  return d;
+}
+async function changeStatus(id,panel){
+  const st=panel.querySelector('[data-status]'); st.textContent='جاري الحفظ...'; st.style.color='var(--muted)';
+  const val=panel.querySelector('[data-ostatus]').value;
+  const { error }=await supabase.from('orders').update({status:val}).eq('id',id);
+  if(error){ st.textContent='خطأ: '+error.message; st.style.color='#e79bab'; return; }
+  st.textContent='✓ تم'; st.style.color='var(--emerald)';
+  const b=panel.querySelector('.obadge'); const o=ostat(val); if(b){b.textContent=o.l;b.style.borderColor=o.c;b.style.color=o.c;}
+  setTimeout(()=>st.textContent='',2000);
+}
+$('#orderFilter').addEventListener('change',loadOrders);
+$('#ordersRefresh').addEventListener('click',loadOrders);
 
 init();
 </script>

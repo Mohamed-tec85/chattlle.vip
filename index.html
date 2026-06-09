@@ -1548,7 +1548,7 @@
     const io=('IntersectionObserver' in window)? new IntersectionObserver(function(ents){ents.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.12}) : null;
 
     grid.innerHTML='';
-    const imgMap={};
+    const imgMap={}, pamt={};
     active.forEach(function(p,i){
       const id='r'+(i+1), roman=toRoman(i+1);
       const ptxt=(p.price_amount!=null)?(Number(p.price_amount).toLocaleString('en-US')+' ر.س'):(p.price||'');
@@ -1559,7 +1559,7 @@
       });
       if(typeof PRICE!=='undefined') PRICE[id]=ptxt;
       if(typeof RN!=='undefined') RN[id]=roman;
-      const url=p.image_url||DEF; imgMap[id]=url;
+      const url=p.image_url||DEF; imgMap[id]=url; pamt[id]=(p.price_amount!=null)?p.price_amount:'';
 
       const card=document.createElement('div');
       card.className='col-card reveal';
@@ -1581,15 +1581,33 @@
       if(io) io.observe(card); else card.classList.add('in');
     });
 
-    // featured card mirrors r4 (if present) — keep its image/price in sync
-    if(imgMap['r4']){
-      const ref=document.querySelector('.best-card [data-i18n="r4.name"]');
-      if(ref){ const bc=ref.closest('.best-card');
-        bc.querySelectorAll('.cc-bottle,.cc-bottle-ref').forEach(function(im){im.src=imgMap['r4'];});
-        const bp=bc.querySelector('.price');
-        if(bp && typeof PRICE!=='undefined' && PRICE['r4']){ const sm=bp.querySelector('small'); bp.textContent=PRICE['r4']+' '; if(sm) bp.appendChild(sm); }
-      }
+    // ---- carousel slots: use uploaded product images (cycling) ----
+    var realImgs=active.filter(function(p){return p.image_url;}).map(function(p){return p.image_url;});
+    if(realImgs.length){
+      document.querySelectorAll('.slot').forEach(function(slot,i){
+        var u=realImgs[i%realImgs.length];
+        slot.querySelectorAll('.bottle,.bottle-reflect').forEach(function(im){im.src=u;});
+      });
     }
+
+    // ---- featured "best" cards mirror real products (image, text, price, add) ----
+    function featureCard(anchorKey,pid){
+      var ref=document.querySelector('.best-card [data-i18n="'+anchorKey+'"]'); if(!ref) return;
+      var bc=ref.closest('.best-card'); if(!bc) return;
+      if(imgMap[pid]) bc.querySelectorAll('.cc-bottle,.cc-bottle-ref').forEach(function(im){im.src=imgMap[pid];});
+      var t=bc.querySelector('.ri-type'); if(t) t.setAttribute('data-i18n',pid+'.type');
+      var n=bc.querySelector('.ri-name'); if(n) n.setAttribute('data-i18n',pid+'.name');
+      var ds=bc.querySelector('.ri-desc'); if(ds) ds.setAttribute('data-i18n',pid+'.desc');
+      var num=bc.querySelector('.cc-num'); if(num && typeof RN!=='undefined' && RN[pid]) num.textContent='N°'+RN[pid];
+      var bp=bc.querySelector('.price');
+      if(bp && typeof PRICE!=='undefined' && PRICE[pid]){ var sm=bp.querySelector('small'); bp.textContent=PRICE[pid]+' '; if(sm) bp.appendChild(sm); }
+      bc.querySelectorAll('a[data-add]').forEach(function(a){
+        a.setAttribute('data-add',pid); a.setAttribute('data-name',pid+'.name'); a.setAttribute('data-type',pid+'.type');
+        if(!a.getAttribute('data-sample') && pamt[pid]!=='') a.setAttribute('data-price',pamt[pid]);
+      });
+    }
+    featureCard('feat.name','r1');
+    featureCard('r4.name','r4');
 
     try{ const s2=await sb.from('settings').select('*').eq('key','col_h2').maybeSingle(); if(s2&&s2.data){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&s2.data['value_'+l]) I18N[l]['col.h2']=s2.data['value_'+l]; }); } }catch(e){}
     try{ const pg=await sb.from('pages').select('*'); if(pg&&pg.data&&window.__INFO){ pg.data.forEach(function(r){ window.__INFO[r.key]={fr:{t:r.title_fr||'',b:r.body_fr||''},en:{t:r.title_en||'',b:r.body_en||''},ar:{t:r.title_ar||'',b:r.body_ar||''}}; }); } }catch(e){}
