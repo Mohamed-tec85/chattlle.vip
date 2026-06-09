@@ -1424,5 +1424,74 @@
   })();
   CART.render();
 </script>
+
+<!-- ===== CHATTLLE · live data from Supabase ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async function(){
+  try{
+    const SB_URL='https://ihammjkslfiiitgvokiy.supabase.co';
+    const SB_KEY='sb_publishable_UwXjwS_FcgagJNUeEOQmIg_gw0t0uEv';
+    if(!window.supabase) return;
+    const sb=window.supabase.createClient(SB_URL,SB_KEY);
+    const { data, error }=await sb.from('products').select('*').order('sort_order',{ascending:true});
+    if(error||!data||!data.length) return;            // keep built-in defaults
+    const active=data.filter(function(p){return p.active!==false;});
+    if(!active.length) return;
+
+    const grid=document.querySelector('.col-grid');
+    if(!grid || typeof I18N==='undefined' || typeof applyLang!=='function') return;
+
+    function toRoman(n){const m=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let r='';for(let k=0;k<m.length;k++){while(n>=m[k][0]){r+=m[k][1];n-=m[k][0];}}return r;}
+    const DEF=(typeof BOTTLE_SRC!=='undefined')?BOTTLE_SRC:'';
+    const io=('IntersectionObserver' in window)? new IntersectionObserver(function(ents){ents.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.12}) : null;
+
+    grid.innerHTML='';
+    const imgMap={};
+    active.forEach(function(p,i){
+      const id='r'+(i+1), roman=toRoman(i+1);
+      ['fr','en','ar'].forEach(function(l){
+        if(I18N[l]){ I18N[l][id+'.name']=p['name_'+l]||''; I18N[l][id+'.type']=p['type_'+l]||''; I18N[l][id+'.desc']=p['desc_'+l]||''; }
+        if(typeof PYR!=='undefined'&&PYR[l]) PYR[l][id]={t:p['top_'+l]||'',h:p['heart_'+l]||'',b:p['base_'+l]||''};
+        if(typeof PDESC!=='undefined'&&PDESC[l]) PDESC[l][id]=p['story_'+l]||'';
+      });
+      if(typeof PRICE!=='undefined') PRICE[id]=p.price||'';
+      if(typeof RN!=='undefined') RN[id]=roman;
+      const url=p.image_url||DEF; imgMap[id]=url;
+
+      const card=document.createElement('div');
+      card.className='col-card reveal';
+      card.setAttribute('data-prod',id);
+      card.innerHTML='<span class="cc-num">'+roman+'</span>'+
+        '<div class="cc-stage"><span class="cc-glow"></span><span class="cc-glass"></span><div class="cc-still"><img class="cc-bottle" alt=""><img class="cc-bottle-ref" alt="" aria-hidden="true"></div></div>'+
+        '<p class="ri-type" data-i18n="'+id+'.type"></p>'+
+        '<h3 class="ri-name" data-i18n="'+id+'.name"></h3>'+
+        '<p class="ri-desc" data-i18n="'+id+'.desc"></p>'+
+        '<div class="cc-foot"><span class="ri-price"></span><span class="ri-cta" data-i18n="cta.discover">Découvrir</span></div>';
+      card.querySelector('.ri-price').textContent=p.price||'';
+      card.querySelectorAll('.cc-bottle,.cc-bottle-ref').forEach(function(im){im.src=url;});
+      function open(e){ if(e) e.preventDefault();
+        if(typeof openProduct==='function') openProduct(id);
+        document.querySelectorAll('#productPage .cc-bottle,#productPage .cc-bottle-ref').forEach(function(im){im.src=url;});
+      }
+      card.querySelector('.ri-cta').addEventListener('click',open);
+      grid.appendChild(card);
+      if(io) io.observe(card); else card.classList.add('in');
+    });
+
+    // featured card mirrors r4 (if present) — keep its image/price in sync
+    if(imgMap['r4']){
+      const ref=document.querySelector('.best-card [data-i18n="r4.name"]');
+      if(ref){ const bc=ref.closest('.best-card');
+        bc.querySelectorAll('.cc-bottle,.cc-bottle-ref').forEach(function(im){im.src=imgMap['r4'];});
+        const bp=bc.querySelector('.price');
+        if(bp && typeof PRICE!=='undefined' && PRICE['r4']){ const sm=bp.querySelector('small'); bp.textContent=PRICE['r4']+' '; if(sm) bp.appendChild(sm); }
+      }
+    }
+
+    applyLang(typeof lang!=='undefined'?lang:'fr');
+  }catch(e){ /* keep built-in defaults */ }
+})();
+</script>
 </body>
 </html>
