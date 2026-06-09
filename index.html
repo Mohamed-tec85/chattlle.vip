@@ -943,6 +943,31 @@
   </div>
 </footer>
 
+<style>
+  .info-page{position:fixed;inset:0;z-index:4500;background:linear-gradient(180deg,var(--noir-2),var(--noir));overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .4s}
+  .info-page.open{opacity:1;visibility:visible}
+  .info-top{display:flex;justify-content:space-between;align-items:center;padding:20px 6vw;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(10,15,12,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .info-brand{font-family:var(--display);letter-spacing:.22em;color:var(--gold-soft);font-size:20px}
+  .info-back{background:none;border:1px solid var(--line);color:var(--gold-soft);border-radius:4px;padding:9px 18px;cursor:pointer;font-family:var(--label);font-size:13px;letter-spacing:.08em;transition:all .3s}
+  [dir=rtl] .info-back{font-family:var(--ar-label)}
+  .info-back:hover{border-color:var(--gold);color:var(--gold)}
+  .info-body{max-width:760px;margin:0 auto;padding:8vh 6vw 14vh}
+  .info-body h2{font-family:var(--display);font-weight:300;font-size:clamp(30px,5vw,46px);color:var(--cream);margin:0 0 26px;letter-spacing:.02em;line-height:1.15}
+  [dir=rtl] .info-body h2{font-family:var(--ar-display);line-height:1.4}
+  .info-body p{color:var(--muted);font-size:17px;line-height:1.95;margin:0 0 20px}
+  .info-body a{color:var(--gold-soft)}
+  .info-body::before{content:"";display:block;width:54px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:26px}
+  [dir=rtl] .info-body::before{background:linear-gradient(270deg,var(--gold),transparent)}
+</style>
+
+<div class="info-page" id="infoPage" aria-hidden="true">
+  <div class="info-top">
+    <span class="info-brand">CHATTLLE</span>
+    <button class="info-back" id="infoBack"><span id="infoBackTxt">Retour</span></button>
+  </div>
+  <div class="info-body"><h2 id="infoTitle"></h2><div id="infoContent"></div></div>
+</div>
+
 <!-- PRODUCT PAGE -->
 <div class="product-page" id="productPage" aria-hidden="true">
   <div class="pp-top">
@@ -1427,6 +1452,74 @@
   CART.render();
 </script>
 
+<script>
+(function(){
+  var INFO={
+    'foot.c1b':{
+      fr:{t:"L'atelier",b:"<p>Au cœur de Paris, chaque extrait CHATTLLE est composé à la main, en très petites séries. Nos parfumeurs dosent les essences goutte à goutte, puis laissent chaque composition mûrir plusieurs semaines avant la mise en flacon.</p><p>Cette lenteur est notre signature : quelques flacons parfaits plutôt qu'une production de masse.</p>"},
+      en:{t:"The Atelier",b:"<p>In the heart of Paris, every CHATTLLE extrait is composed by hand, in very small batches. Our perfumers measure each essence drop by drop, then let every composition rest for weeks before bottling.</p><p>This slowness is our signature: a few perfect flacons rather than mass production.</p>"},
+      ar:{t:"الورشة",b:"<p>في قلب باريس، يُصنع كل خلاصة من CHATTLLE يدويًا وبكميات صغيرة جدًا. يوازن عطّارونا الجواهر قطرةً قطرة، ثم يتركون كل تركيبة تنضج أسابيع قبل التعبئة.</p><p>هذا التأنّي هو توقيعنا: بضع زجاجات مثالية بدل الإنتاج الكمّي.</p>"}},
+    'foot.c1c':{
+      fr:{t:"Le parfumeur",b:"<p>Derrière CHATTLLE se tient un nez formé à Grasse, attaché aux matières nobles : oud, iris, ambre gris et cuir. Sa quête : capturer l'heure exacte où le jour bascule dans la nuit.</p>"},
+      en:{t:"The Perfumer",b:"<p>Behind CHATTLLE stands a nose trained in Grasse, devoted to noble materials: oud, iris, ambergris and leather. The quest: to capture the exact hour when day tips into night.</p>"},
+      ar:{t:"صانع العطر",b:"<p>خلف CHATTLLE عطّارٌ تدرّب في غراس، شغوفٌ بالمواد النبيلة: العود والسوسن والعنبر الرمادي والجلد. غايته أن يلتقط الساعة التي يتحوّل فيها النهار إلى ليل.</p>"}},
+    'foot.c1d':{
+      fr:{t:"Durabilité",b:"<p>Nous travaillons avec des matières sourcées de façon responsable, des flacons rechargeables et des emballages recyclables. Moins, mais mieux.</p>"},
+      en:{t:"Sustainability",b:"<p>We work with responsibly sourced materials, refillable flacons and recyclable packaging. Less, but better.</p>"},
+      ar:{t:"الاستدامة",b:"<p>نعمل بموادّ مصدرها مسؤول، وزجاجات قابلة لإعادة التعبئة، وتغليف قابل للتدوير. أقلّ، لكن أفضل.</p>"}},
+    'foot.c2b':{
+      fr:{t:"Éditions rares",b:"<p>Chaque année, CHATTLLE dévoile une série limitée et numérotée — des compositions audacieuses tirées à quelques centaines d'exemplaires. Une fois épuisées, elles ne reviennent jamais.</p>"},
+      en:{t:"Rare Editions",b:"<p>Each year, CHATTLLE unveils a limited, numbered series — bold compositions made in just a few hundred pieces. Once gone, they never return.</p>"},
+      ar:{t:"إصدارات نادرة",b:"<p>كل عام تكشف CHATTLLE سلسلة محدودة ومرقّمة — تركيبات جريئة تُنتَج بمئات معدودة فقط. وحين تنفد، لا تعود أبدًا.</p>"}},
+    'foot.c2c':{
+      fr:{t:"Coffrets",b:"<p>Offrez CHATTLLE dans un écrin noir et or, avec gravure du nom sur demande. Nos coffrets réunissent un extrait et sa miniature, prêts à offrir.</p>"},
+      en:{t:"Gift Boxes",b:"<p>Give CHATTLLE in a black-and-gold case, with name engraving on request. Our boxes pair an extrait with its miniature, ready to gift.</p>"},
+      ar:{t:"علب الهدايا",b:"<p>قدّم CHATTLLE في علبة سوداء وذهبية، مع نقش الاسم عند الطلب. تجمع علبنا بين الخلاصة ونسختها المصغّرة، جاهزةً للإهداء.</p>"}},
+    'foot.c2d':{
+      fr:{t:"Échantillons",b:"<p>Hésitant ? Découvrez nos extraits en échantillon de 2 ml avant de choisir votre flacon. Le montant de l'échantillon est déduit de votre première commande.</p>"},
+      en:{t:"Samples",b:"<p>Unsure? Discover our extraits in 2 ml samples before choosing your flacon. The sample price is deducted from your first order.</p>"},
+      ar:{t:"العيّنات",b:"<p>متردّد؟ اكتشف خلاصاتنا بعيّنة ٢ مل قبل اختيار زجاجتك. يُخصم مبلغ العيّنة من طلبك الأول.</p>"}},
+    'foot.c3a':{
+      fr:{t:"Contact",b:"<p>Notre équipe vous répond sous 24 heures.</p><p>E-mail : <a href='mailto:contact@chattlle.vip'>contact@chattlle.vip</a><br>Téléphone : +966 5X XXX XXXX</p>"},
+      en:{t:"Contact",b:"<p>Our team replies within 24 hours.</p><p>Email: <a href='mailto:contact@chattlle.vip'>contact@chattlle.vip</a><br>Phone: +966 5X XXX XXXX</p>"},
+      ar:{t:"تواصل معنا",b:"<p>يردّ فريقنا خلال ٢٤ ساعة.</p><p>البريد: <a href='mailto:contact@chattlle.vip'>contact@chattlle.vip</a><br>الهاتف: +966 5X XXX XXXX</p>"}},
+    'foot.c3b':{
+      fr:{t:"Livraison & retours",b:"<p>Livraison gratuite à partir de 500 ر.س. Expédition sous 2 à 4 jours ouvrés en Arabie saoudite et dans le Golfe.</p><p>Retours acceptés sous 14 jours sur les flacons non ouverts.</p>"},
+      en:{t:"Shipping & Returns",b:"<p>Free shipping on orders over 500 ر.س. Dispatch within 2 to 4 business days across Saudi Arabia and the Gulf.</p><p>Returns accepted within 14 days on unopened flacons.</p>"},
+      ar:{t:"الشحن والإرجاع",b:"<p>شحن مجاني للطلبات من ٥٠٠ ر.س. التوصيل خلال ٢–٤ أيام عمل داخل السعودية ودول الخليج.</p><p>الإرجاع متاح خلال ١٤ يومًا للزجاجات غير المفتوحة.</p>"}},
+    'foot.c3c':{
+      fr:{t:"Conseil olfactif",b:"<p>Profitez d'un conseil personnalisé pour trouver le parfum qui vous ressemble. Écrivez-nous vos préférences, et notre parfumeur vous guidera.</p>"},
+      en:{t:"Fragrance Consultation",b:"<p>Enjoy a personalised consultation to find the scent that suits you. Send us your preferences, and our perfumer will guide you.</p>"},
+      ar:{t:"استشارة عطرية",b:"<p>احصل على استشارة شخصية لإيجاد العطر الذي يشبهك. أرسل لنا تفضيلاتك، وسيوجّهك عطّارنا.</p>"}},
+    'foot.c3d':{
+      fr:{t:"Boutiques",b:"<p>CHATTLLE est une maison en ligne. Retrouvez nos extraits ici, ou lors de nos événements privés à Riyad, Djeddah et Paris.</p>"},
+      en:{t:"Stores",b:"<p>CHATTLLE is an online house. Find our extraits here, or at our private events in Riyadh, Jeddah and Paris.</p>"},
+      ar:{t:"المتاجر",b:"<p>CHATTLLE دارٌ إلكترونية. تجد خلاصاتنا هنا، أو في فعالياتنا الخاصة في الرياض وجدة وباريس.</p>"}}
+  };
+  window.__INFO=INFO;
+  var BACK={fr:'Retour',en:'Back',ar:'العودة'};
+  var page=document.getElementById('infoPage'),titleEl=document.getElementById('infoTitle'),
+      contentEl=document.getElementById('infoContent'),backTxt=document.getElementById('infoBackTxt');
+  function curLang(){return (typeof lang!=='undefined')?lang:'fr';}
+  function openInfo(key){var l=curLang(),d=INFO[key];if(!d)return;var c=d[l]||d.fr;
+    titleEl.textContent=c.t;contentEl.innerHTML=c.b;backTxt.textContent=BACK[l]||BACK.fr;
+    page.classList.add('open');page.setAttribute('aria-hidden','false');
+    document.body.classList.add('co-open');document.body.style.overflow='hidden';page.scrollTop=0;}
+  function closeInfo(){page.classList.remove('open');page.setAttribute('aria-hidden','true');
+    document.body.classList.remove('co-open');
+    if(!document.body.classList.contains('pp-open'))document.body.style.overflow='';}
+  document.getElementById('infoBack').addEventListener('click',closeInfo);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))closeInfo();});
+  var SCROLL={'foot.c1a':'#story','foot.c2a':'#collection'};
+  document.querySelectorAll('footer a[data-i18n^="foot.c"]').forEach(function(a){
+    a.addEventListener('click',function(e){e.preventDefault();
+      var key=a.getAttribute('data-i18n');
+      if(SCROLL[key]){var t=document.querySelector(SCROLL[key]);if(t)t.scrollIntoView({behavior:'smooth'});return;}
+      openInfo(key);
+    });
+  });
+})();
+</script>
 <!-- ===== CHATTLLE · live data from Supabase ===== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1493,6 +1586,7 @@
     }
 
     try{ const s2=await sb.from('settings').select('*').eq('key','col_h2').maybeSingle(); if(s2&&s2.data){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&s2.data['value_'+l]) I18N[l]['col.h2']=s2.data['value_'+l]; }); } }catch(e){}
+    try{ const pg=await sb.from('pages').select('*'); if(pg&&pg.data&&window.__INFO){ pg.data.forEach(function(r){ window.__INFO[r.key]={fr:{t:r.title_fr||'',b:r.body_fr||''},en:{t:r.title_en||'',b:r.body_en||''},ar:{t:r.title_ar||'',b:r.body_ar||''}}; }); } }catch(e){}
     applyLang(typeof lang!=='undefined'?lang:'fr');
   }catch(e){ /* keep built-in defaults */ }
 })();
