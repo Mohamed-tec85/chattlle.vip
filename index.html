@@ -704,6 +704,50 @@
     .foot-grid{grid-template-columns:1fr}
   }
 
+  /* ===== 3D product details frame ===== */
+  .pp-body{perspective:1700px}
+  .pp-info{transform-style:preserve-3d;
+    background:linear-gradient(155deg,rgba(199,162,74,.07),rgba(255,255,255,.012) 42%,rgba(10,15,12,.28));
+    border:1px solid rgba(199,162,74,.2);border-radius:12px;padding:34px 32px;
+    box-shadow:0 36px 80px rgba(0,0,0,.55),0 0 0 1px rgba(199,162,74,.06),inset 0 1px 0 rgba(255,243,207,.06),inset 0 0 50px rgba(199,162,74,.05);
+    transform:rotateY(-7deg);transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .6s}
+  [dir=rtl] .pp-info{transform:rotateY(7deg)}
+  .pp-info:hover{transform:rotateY(0deg);
+    box-shadow:0 46px 92px rgba(0,0,0,.62),0 0 0 1px rgba(199,162,74,.3),inset 0 0 64px rgba(199,162,74,.08)}
+  @media(max-width:860px){.pp-info{transform:none!important;padding:26px 22px}}
+
+  /* ===== elegant product details (global-perfume feel) ===== */
+  .pp-body{gap:70px}
+  .pp-info{max-width:500px}
+  .pp-kicker{margin-bottom:18px}
+  .pp-kicker .ri-type{letter-spacing:.34em}
+  .pp-name{font-size:clamp(2.4rem,4.4vw,3.6rem);line-height:1.05}
+  .pp-rule{width:64px;height:2px;margin-bottom:26px;background:linear-gradient(90deg,var(--gold),rgba(199,162,74,.12))}
+  [dir=rtl] .pp-rule{background:linear-gradient(270deg,var(--gold),rgba(199,162,74,.12))}
+  .pp-desc{font-size:1.16rem;line-height:1.78;color:#ece5d8;margin-bottom:28px}
+  .pp-pyramid{margin:6px 0 30px}
+  .pp-tier{padding:17px 2px}
+  .pp-tier-v{font-size:1.1rem}
+  .pp-buy{align-items:baseline;gap:14px;margin:4px 0 30px;padding-top:26px;border-top:1px solid rgba(199,162,74,.18)}
+  .pp-price{font-size:2.4rem}
+  .pp-actions{margin-top:2px}
+  .pp-actions .btn-fill{padding:18px 46px;font-size:11px;letter-spacing:.26em;
+    background:linear-gradient(120deg,#d8b35e,#caa44d 48%,#e7d191);color:var(--noir);border:none;
+    box-shadow:0 16px 40px rgba(199,162,74,.26);transition:transform .4s,box-shadow .4s}
+  .pp-actions .btn-fill:hover{box-shadow:0 22px 54px rgba(199,162,74,.42);transform:translateY(-2px)}
+  [dir=rtl] .pp-actions .btn-fill{letter-spacing:.05em}
+  @media(max-width:860px){
+    .pp-info{text-align:center;align-items:center}
+    .pp-kicker{justify-content:center}
+    .pp-rule{margin-left:auto;margin-right:auto}
+    .pp-pyramid,.pp-story-wrap{align-self:stretch}
+    .pp-story-wrap{text-align:right}
+    [dir=ltr] .pp-story-wrap{text-align:left}
+    .pp-buy{justify-content:center}
+    .pp-actions{justify-content:center;width:100%}
+    .pp-actions .btn-fill{width:100%}
+  }
+
 </style>
 <script type="application/ld+json">
 [
@@ -842,8 +886,8 @@
       <p class="ri-desc" data-i18n="b1.desc">Cardamome, iris, oud et musc — l'heure où tout bascule.</p>
       <span class="price">390 ر.س <small data-i18n="feat.unit">/ Extrait 100 ml</small></span>
       <div class="hero-actions">
-        <a href="#" class="btn btn-fill" data-i18n="btn.cart" data-add="b1" data-type="b1.type" data-name="feat.name" data-price="390">Ajouter au panier</a>
-        <a href="#" class="btn btn-ghost" data-i18n="feat.sample" data-add="b1" data-type="b1.type" data-name="feat.name" data-price="9" data-sample="1">Échantillon · 9 ر.س</a>
+        <a href="#" class="btn btn-fill" data-i18n="cta.discover" data-open="r1">Découvrir</a>
+        
       </div>
     </div>
 
@@ -855,8 +899,8 @@
       <p class="ri-desc" data-i18n="r4.desc">Cuir brut, safran et poivre noir pour les nuits sans retour.</p>
       <span class="price">370 ر.س <small data-i18n="feat.unit">/ Extrait 100 ml</small></span>
       <div class="hero-actions">
-        <a href="#" class="btn btn-fill" data-i18n="btn.cart" data-add="r4" data-type="r4.type" data-name="r4.name" data-price="370">Ajouter au panier</a>
-        <a href="#" class="btn btn-ghost" data-i18n="feat.sample" data-add="r4" data-type="r4.type" data-name="r4.name" data-price="9" data-sample="1">Échantillon · 9 ر.س</a>
+        <a href="#" class="btn btn-fill" data-i18n="cta.discover" data-open="r4">Découvrir</a>
+        
       </div>
     </div>
   </div>
@@ -1024,7 +1068,7 @@
       <div class="pp-buy"><span class="price pp-price" id="ppPrice"></span><small class="pp-unit" data-i18n="feat.unit">/ Extrait 100 ml</small></div>
       <div class="pp-actions">
         <a href="#" class="btn btn-fill" id="ppAdd" data-i18n="btn.cart">Ajouter au panier</a>
-        <a href="#" class="btn btn-ghost" id="ppSample" data-i18n="feat.sample">Échantillon · 9 ر.س</a>
+        
       </div>
     </div>
   </div>
@@ -1375,6 +1419,8 @@
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&curProd)closeProduct();});
   document.querySelectorAll('.collection .ri-cta').forEach(c=>c.addEventListener('click',(e)=>{
     e.preventDefault();const card=c.closest('.col-card');if(card&&card.dataset.prod)openProduct(card.dataset.prod);}));
+  document.querySelectorAll('[data-open]').forEach(function(b){b.addEventListener('click',function(e){
+    e.preventDefault();if(typeof openProduct==='function')openProduct(b.dataset.open);});});
   applyLang('fr');
 
   // reuse the embedded emblem for the header brand logo
@@ -1628,10 +1674,7 @@
       var num=bc.querySelector('.cc-num'); if(num && typeof RN!=='undefined' && RN[pid]) num.textContent='N°'+RN[pid];
       var bp=bc.querySelector('.price');
       if(bp && typeof PRICE!=='undefined' && PRICE[pid]){ var sm=bp.querySelector('small'); bp.textContent=PRICE[pid]+' '; if(sm) bp.appendChild(sm); }
-      bc.querySelectorAll('a[data-add]').forEach(function(a){
-        a.setAttribute('data-add',pid); a.setAttribute('data-name',pid+'.name'); a.setAttribute('data-type',pid+'.type');
-        if(!a.getAttribute('data-sample') && pamt[pid]!=='') a.setAttribute('data-price',pamt[pid]);
-      });
+      bc.querySelectorAll('a[data-open]').forEach(function(a){ a.setAttribute('data-open',pid); });
     }
     featureCard('feat.name','r1');
     featureCard('r4.name','r4');
