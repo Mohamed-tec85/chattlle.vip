@@ -178,6 +178,21 @@
 
     <div id="view-promos" class="hidden">
       <div class="card">
+        <h3>بانر العرض المتحرك (الزجاجة الراشّة + الكود الذهبي)</h3>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><input type="checkbox" id="pbEnable" checked style="width:auto"><label for="pbEnable" style="margin:0">إظهار البانر في الصفحة الرئيسية</label></div>
+        <div class="shared" style="grid-template-columns:1fr 1fr">
+          <div><label>الكود (يظهر في فقاعة ذهبية)</label><input id="pbCode" placeholder="مثال: WELCOME"></div>
+          <div></div>
+        </div>
+        <div class="lang-grid">
+          <div class="lang-col"><h4>Français</h4><textarea id="pbFr" placeholder="50 ر.س de remise dès 300 ر.س — copiez le code"></textarea></div>
+          <div class="lang-col"><h4>English</h4><textarea id="pbEn" placeholder="50 ر.س off on orders over 300 ر.س — copy the code"></textarea></div>
+          <div class="lang-col"><h4>العربية</h4><textarea id="pbAr" placeholder="كود خصم بقيمة ٥٠ ريال للطلبات أكثر من ٣٠٠ ريال — انسخ الكود"></textarea></div>
+        </div>
+        <div class="hint">النصّ يظهر ذهبياً داخل رذاذ العطر، والكود في فقاعة. مهم: أنشئ نفس الكود في «إضافة كود خصم» بالأسفل ليعمل فعلياً عند العميل في السلة.</div>
+        <div class="save-row"><button class="btn-gold" id="pbSave">حفظ البانر</button><span class="status" id="pbStatus"></span></div>
+      </div>
+      <div class="card">
         <h3>إضافة كود خصم</h3>
         <div class="shared" style="grid-template-columns:repeat(2,1fr)">
           <div><label>الكود</label><input id="prCode" placeholder="مثال: WELCOME10"></div>
@@ -213,7 +228,7 @@ async function init(){ const { data:{session} }=await supabase.auth.getSession()
 function showApp(on){
   $('#login').style.display=on?'none':'block';
   $('#app').style.display=on?'block':'none';
-  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadPages(); loadOrders(); loadShipping(); loadPromos(); }
+  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadPages(); loadOrders(); loadShipping(); loadPromos(); loadPromoBanner(); }
 }
 $('#loginBtn').addEventListener('click',async()=>{
   const msg=$('#loginMsg'); msg.textContent=''; msg.className='msg';
@@ -239,7 +254,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   if(v==='home') loadDashboard();
   if(v==='pages') loadPages();
   if(v==='orders') loadOrders();
-  if(v==='promos') loadPromos();
+  if(v==='promos'){ loadPromos(); loadPromoBanner(); }
 }));
 
 let chartProd=null, chartTime=null;
@@ -545,6 +560,22 @@ async function addPromo(){
 }
 $('#prAdd')&&$('#prAdd').addEventListener('click',addPromo);
 $('#prRefresh')&&$('#prRefresh').addEventListener('click',loadPromos);
+async function loadPromoBanner(){
+  if(!$('#pbSave')) return;
+  const { data }=await supabase.from('settings').select('*').in('key',['promo_banner','promo_banner_cfg']);
+  const m={}; (data||[]).forEach(r=>m[r.key]=r);
+  if(m['promo_banner']){ $('#pbFr').value=m['promo_banner'].value_fr||''; $('#pbEn').value=m['promo_banner'].value_en||''; $('#pbAr').value=m['promo_banner'].value_ar||''; }
+  if(m['promo_banner_cfg']){ $('#pbCode').value=m['promo_banner_cfg'].value_fr||''; $('#pbEnable').checked=(m['promo_banner_cfg'].value_en!=='0'); }
+}
+$('#pbSave')&&$('#pbSave').addEventListener('click',async()=>{
+  const st=$('#pbStatus'); st.textContent='جاري الحفظ...'; st.style.color='var(--muted)';
+  const t={key:'promo_banner',value_fr:$('#pbFr').value,value_en:$('#pbEn').value,value_ar:$('#pbAr').value,updated_at:new Date().toISOString()};
+  const c={key:'promo_banner_cfg',value_fr:$('#pbCode').value.trim(),value_en:$('#pbEnable').checked?'1':'0',updated_at:new Date().toISOString()};
+  const r1=await supabase.from('settings').upsert(t,{onConflict:'key'});
+  const r2=await supabase.from('settings').upsert(c,{onConflict:'key'});
+  if((r1&&r1.error)||(r2&&r2.error)){ st.textContent='تعذّر الحفظ'; st.style.color='#e79bab'; return; }
+  st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
+});
 
 init();
 </script>
