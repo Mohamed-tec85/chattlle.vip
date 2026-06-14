@@ -748,6 +748,19 @@
     .pp-actions .btn-fill{width:100%}
   }
 
+  /* ===== promo code (checkout) ===== */
+  .co-promo{margin:14px 0 4px}
+  .co-promo-row{display:flex;gap:8px}
+  .co-promo .co-input{flex:1;margin:0}
+  .co-promo-btn{font-family:var(--label);text-transform:uppercase;letter-spacing:.16em;font-size:10px;
+    background:transparent;color:var(--gold-soft);border:1px solid var(--line);border-radius:4px;padding:0 16px;cursor:pointer;white-space:nowrap;transition:all .35s}
+  .co-promo-btn:hover{border-color:var(--gold);color:var(--gold)}
+  [dir=rtl] .co-promo-btn{font-family:var(--ar-label);letter-spacing:0;font-size:12px}
+  .co-promo-msg{margin:8px 2px 0;font-size:12px;min-height:1px;color:var(--muted)}
+  .co-promo-msg.ok{color:#7fcf9a}
+  .co-promo-msg.warn{color:#e6c46a}
+  .co-promo-msg.err{color:#e08a7a}
+
 </style>
 <script type="application/ld+json">
 [
@@ -1150,6 +1163,13 @@
       <h3 class="co-sum-h" data-i18n="co.summary">Votre commande</h3>
       <div id="coItems"></div>
       <div id="coBreakdown"></div>
+      <div class="co-promo">
+        <div class="co-promo-row">
+          <input class="co-input" id="coPromoCode" placeholder="Code promo" autocomplete="off">
+          <button class="co-promo-btn" id="coPromoApply" type="button">Appliquer</button>
+        </div>
+        <p class="co-promo-msg" id="coPromoMsg"></p>
+      </div>
       <div class="co-sum-total"><span data-i18n="cart.total">Total</span><b id="coSumTotal">0 ر.س</b></div>
     </aside>
   </div>
@@ -1491,7 +1511,7 @@
   (function(){
     var page=document.getElementById('checkoutPage'),itemsEl=document.getElementById('coItems'),
         sumTotal=document.getElementById('coSumTotal'),payTotal=document.getElementById('coPayTotal'),
-        success=document.getElementById('coSuccess'),method='mada';
+        success=document.getElementById('coSuccess'),method='mada',promo=null;
     function render(){
       var a=CART.items();
       itemsEl.innerHTML=a.map(function(it){
@@ -1499,7 +1519,7 @@
           '</div><div class="co-item-meta">'+(CART.meta(it)?CART.meta(it)+' \u00b7 ':'')+'\u00d7'+it.qty+'</div></div>'+
           '<div class="co-item-price">'+(it.price*it.qty)+' ر.س</div></div>';
       }).join('');
-      var sub=CART.total();var SH=window.__SHIP||{cost:0,freeOver:0};var ship=(SH.freeOver>0&&sub>=SH.freeOver)?0:(Number(SH.cost)||0);var taxBase=sub+ship,tax=Math.round(taxBase*0.15*100)/100,tot=sub+ship+tax;var bd=document.getElementById('coBreakdown');if(bd){var ROW=function(a,b){return '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px"><span>'+a+'</span><span>'+b+'</span></div>';};var sl=(lang==='ar'?'المجموع الفرعي':lang==='en'?'Subtotal':'Sous-total');var shl=(lang==='ar'?'الشحن':lang==='en'?'Shipping':'Livraison');var fre=(lang==='ar'?'مجاني':lang==='en'?'Free':'Gratuite');var vl=(lang==='ar'?'ضريبة القيمة المضافة ١٥٪':lang==='en'?'VAT 15%':'TVA 15%');bd.innerHTML=ROW(sl,sub+' ر.س')+ROW(shl,(ship===0?fre:(ship+' ر.س')))+ROW(vl,tax+' ر.س');}sumTotal.textContent=tot+' ر.س';payTotal.textContent='· '+tot+' ر.س';
+      var sub=CART.total();var SH=window.__SHIP||{cost:0,freeOver:0};var ship=(SH.freeOver>0&&sub>=SH.freeOver)?0:(Number(SH.cost)||0);var dsc=pdisc(sub);var goods=sub-dsc;var taxBase=goods+ship,tax=Math.round(taxBase*0.15*100)/100,tot=goods+ship+tax;var bd=document.getElementById('coBreakdown');if(bd){var ROW=function(a,b){return '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px"><span>'+a+'</span><span>'+b+'</span></div>';};var sl=L('المجموع الفرعي','Subtotal','Sous-total');var shl=L('الشحن','Shipping','Livraison');var fre=L('مجاني','Free','Gratuite');var vl=L('ضريبة القيمة المضافة ١٥٪','VAT 15%','TVA 15%');var dl=L('الخصم','Discount','Remise');var bhtml=ROW(sl,sub+' ر.س');if(dsc>0)bhtml+=ROW(dl,'\u2212 '+dsc+' ر.س');bhtml+=ROW(shl,(ship===0?fre:(ship+' ر.س')))+ROW(vl,tax+' ر.س');bd.innerHTML=bhtml;}var pIn=document.getElementById('coPromoCode'),pBtn=document.getElementById('coPromoApply'),pMsg=document.getElementById('coPromoMsg');if(pIn)pIn.placeholder=L('كود الخصم','Promo code','Code promo');if(pBtn)pBtn.textContent=promo?L('إزالة','Remove','Retirer'):L('تطبيق','Apply','Appliquer');if(pMsg&&promo){if(promo.min&&sub<promo.min){pMsg.textContent=L('الحدّ الأدنى '+promo.min+' ر.س','Min '+promo.min+' SAR','Min '+promo.min+' SAR');pMsg.className='co-promo-msg warn';}else{pMsg.textContent=L('تم تطبيق الكود · \u2212'+dsc+' ر.س','Code applied · \u2212'+dsc+' SAR','Code appliqué · \u2212'+dsc+' ر.س');pMsg.className='co-promo-msg ok';}}sumTotal.textContent=tot+' ر.س';payTotal.textContent='· '+tot+' ر.س';
     }
     window.renderCheckout=function(){if(page.classList.contains('open'))render();};
     function openCo(){if(!CART.count())return;try{if(window.gtag){var gi=CART.items().map(function(it){return {item_name:CART.label(it),price:it.price,quantity:it.qty};});gtag('event','begin_checkout',{currency:'SAR',value:CART.total(),items:gi});}}catch(e){}success.classList.remove('show');render();page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.classList.add('co-open');document.body.style.overflow='hidden';}
@@ -1507,6 +1527,10 @@
     var coBtn=document.getElementById('cartCheckout');
     if(coBtn)coBtn.addEventListener('click',function(){CART.close();openCo();});
     document.getElementById('coBack').addEventListener('click',closeCo);
+    function pdisc(sub){if(!promo)return 0;if(promo.min&&sub<promo.min)return 0;var d=(promo.type==='percent')?Math.round(sub*promo.value/100*100)/100:(Number(promo.value)||0);if(d>sub)d=sub;return d;}
+    function L(ar,en,fr){return lang==='ar'?ar:lang==='en'?en:fr;}
+    function applyPromo(){var pIn=document.getElementById('coPromoCode'),pMsg=document.getElementById('coPromoMsg');var setMsg=function(t,c){if(pMsg){pMsg.textContent=t;pMsg.className='co-promo-msg '+(c||'');}};if(promo){promo=null;if(pIn)pIn.value='';setMsg('','');render();return;}var code=(pIn&&pIn.value.trim())||'';if(!code)return;var sub=CART.total();var sb=window.__sb;if(!sb){setMsg(L('تعذّر التحقّق','Could not verify','Erreur'),'warn');return;}setMsg(L('جارٍ التحقّق…','Checking…','Vérification…'),'');sb.rpc('apply_promo',{p_code:code,p_subtotal:sub}).then(function(r){var d=r&&r.data;if(d&&d.valid){promo={code:d.code,type:d.type,value:Number(d.value)||0,min:Number(d.min)||0};render();}else if(d&&d.reason==='min'){promo=null;setMsg(L('الحدّ الأدنى '+d.min_subtotal+' ر.س','Min '+d.min_subtotal+' SAR','Min '+d.min_subtotal+' SAR'),'warn');}else{promo=null;setMsg(L('كود غير صالح','Invalid code','Code invalide'),'err');}}).catch(function(){setMsg(L('تعذّر التحقّق','Could not verify','Erreur'),'warn');});}
+    (function(){var pb=document.getElementById('coPromoApply');if(pb)pb.addEventListener('click',applyPromo);var pc=document.getElementById('coPromoCode');if(pc)pc.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();applyPromo();}});})();
     page.querySelectorAll('.co-method').forEach(function(m){m.addEventListener('click',function(){
       method=m.dataset.method;
       page.querySelectorAll('.co-method').forEach(function(x){x.classList.toggle('on',x===m);});
@@ -1517,9 +1541,9 @@
       var ref='CHT-'+Math.random().toString(36).slice(2,8).toUpperCase();
       var d=I18N[lang]||{};
       document.getElementById('coOrderRef').textContent=(d['co.ref']||'Order')+' '+ref;
-      try{var sb=window.__sb;if(sb){var its=CART.items();var sub=CART.total();var SH=window.__SHIP||{cost:0,freeOver:0};var ship=(SH.freeOver>0&&sub>=SH.freeOver)?0:(Number(SH.cost)||0);var tax=Math.round((sub+ship)*0.15*100)/100,tot=sub+ship+tax;var gv=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};sb.from('orders').insert({customer_name:gv('coName'),email:gv('coEmail'),phone:gv('coPhone'),address:gv('coAddr'),payment_method:method,subtotal:sub,shipping:ship,tax:tax,total:tot,currency:'SAR',status:'placed'}).select().then(function(r){if(r&&r.data&&r.data[0]){var oid=r.data[0].id;var rows=its.map(function(it){return {order_id:oid,product_name:CART.label(it),unit_price:it.price,qty:it.qty,line_total:it.price*it.qty};});sb.from('order_items').insert(rows).then(function(){try{sb.functions.invoke('send-order-email',{body:{order_id:oid}});}catch(e){}});}});}}catch(e){}
-      try{if(window.gtag){var gi=CART.items().map(function(it){return {item_name:CART.label(it),price:it.price,quantity:it.qty};});var gs=CART.total();var GS=window.__SHIP||{cost:0,freeOver:0};var gsh=(GS.freeOver>0&&gs>=GS.freeOver)?0:(Number(GS.cost)||0);var gt=Math.round((gs+gsh)*0.15*100)/100;gtag('event','purchase',{transaction_id:ref,value:gs+gsh+gt,tax:gt,shipping:gsh,currency:'SAR',items:gi});}}catch(e){}
-      success.classList.add('show');CART.clear();
+      try{var sb=window.__sb;if(sb){var its=CART.items();var sub=CART.total();var SH=window.__SHIP||{cost:0,freeOver:0};var ship=(SH.freeOver>0&&sub>=SH.freeOver)?0:(Number(SH.cost)||0);var dsc=pdisc(sub);var goods=sub-dsc;var tax=Math.round((goods+ship)*0.15*100)/100,tot=goods+ship+tax;var gv=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};sb.from('orders').insert({customer_name:gv('coName'),email:gv('coEmail'),phone:gv('coPhone'),address:gv('coAddr'),payment_method:method,subtotal:sub,discount:dsc,promo_code:(promo?promo.code:null),shipping:ship,tax:tax,total:tot,currency:'SAR',status:'placed'}).select().then(function(r){if(r&&r.data&&r.data[0]){var oid=r.data[0].id;var rows=its.map(function(it){return {order_id:oid,product_name:CART.label(it),unit_price:it.price,qty:it.qty,line_total:it.price*it.qty};});sb.from('order_items').insert(rows).then(function(){try{sb.functions.invoke('send-order-email',{body:{order_id:oid}});}catch(e){}});}});}}catch(e){}
+      try{if(window.gtag){var gi=CART.items().map(function(it){return {item_name:CART.label(it),price:it.price,quantity:it.qty};});var gs=CART.total();var GS=window.__SHIP||{cost:0,freeOver:0};var gsh=(GS.freeOver>0&&gs>=GS.freeOver)?0:(Number(GS.cost)||0);var gdc=pdisc(gs);var ggoods=gs-gdc;var gt=Math.round((ggoods+gsh)*0.15*100)/100;gtag('event','purchase',{transaction_id:ref,value:ggoods+gsh+gt,tax:gt,shipping:gsh,currency:'SAR',coupon:(promo?promo.code:undefined),items:gi});}}catch(e){}
+      success.classList.add('show');CART.clear();promo=null;var _pc=document.getElementById('coPromoCode');if(_pc)_pc.value='';var _pm=document.getElementById('coPromoMsg');if(_pm){_pm.textContent='';_pm.className='co-promo-msg';}
     });
     var done=document.getElementById('coDone');
     if(done)done.addEventListener('click',function(){success.classList.remove('show');closeCo();});

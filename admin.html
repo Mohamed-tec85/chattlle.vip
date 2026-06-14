@@ -105,6 +105,7 @@
         <button class="tab" data-view="products">المنتجات</button>
         <button class="tab" data-view="pages">الصفحات</button>
         <button class="tab" data-view="orders">الطلبات</button>
+        <button class="tab" data-view="promos">أكواد الخصم</button>
       </div>
       <div class="actions">
         <a href="index.html" target="_blank"><button>عرض الموقع ↗</button></a>
@@ -174,6 +175,24 @@
       </div>
       <div id="ordersList"></div>
     </div>
+
+    <div id="view-promos" class="hidden">
+      <div class="card">
+        <h3>إضافة كود خصم</h3>
+        <div class="shared" style="grid-template-columns:repeat(2,1fr)">
+          <div><label>الكود</label><input id="prCode" placeholder="مثال: WELCOME10"></div>
+          <div><label>النوع</label><select id="prType"><option value="percent">نسبة ٪</option><option value="fixed">مبلغ ثابت (ر.س)</option></select></div>
+          <div><label>القيمة</label><input type="number" step="0.01" id="prValue" placeholder="مثال: 10"></div>
+          <div><label>حدّ أدنى للطلب (ر.س)</label><input type="number" step="0.01" id="prMin" placeholder="0"></div>
+          <div><label>تاريخ الانتهاء (اختياري)</label><input type="date" id="prExp"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:24px"><input type="checkbox" id="prActive" checked style="width:auto"><label for="prActive" style="margin:0">مُفعّل</label></div>
+        </div>
+        <div class="hint">«نسبة»: قيمة بين 0 و100 (مثال 10 = خصم ١٠٪). «مبلغ ثابت»: بالريال. الحدّ الأدنى 0 = بلا شرط. حفظ كود بنفس الاسم يحدّثه.</div>
+        <div class="save-row"><button class="btn-gold" id="prAdd">+ إضافة الكود</button><span class="status" id="prStatus"></span></div>
+      </div>
+      <div class="toolbar"><h2>الأكواد الحالية</h2><button id="prRefresh">تحديث</button></div>
+      <div id="promosList"></div>
+    </div>
   </div>
 </div>
 
@@ -188,12 +207,13 @@ const LFIELDS=[['name','الاسم','input'],['type','النوع','input'],['des
                ['story','القصّة','textarea'],['top','النوتة العلوية','input'],['heart','نوتة القلب','input'],['base','النوتة القاعدية','input']];
 const $=s=>document.querySelector(s);
 const sar=n=>(Number(n)||0).toLocaleString('en-US',{maximumFractionDigits:2})+' ر.س';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 async function init(){ const { data:{session} }=await supabase.auth.getSession(); showApp(!!session); }
 function showApp(on){
   $('#login').style.display=on?'none':'block';
   $('#app').style.display=on?'block':'none';
-  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadPages(); loadOrders(); loadShipping(); }
+  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadPages(); loadOrders(); loadShipping(); loadPromos(); }
 }
 $('#loginBtn').addEventListener('click',async()=>{
   const msg=$('#loginMsg'); msg.textContent=''; msg.className='msg';
@@ -215,9 +235,11 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   $('#view-products').classList.toggle('hidden', v!=='products');
   $('#view-pages').classList.toggle('hidden', v!=='pages');
   $('#view-orders').classList.toggle('hidden', v!=='orders');
+  $('#view-promos').classList.toggle('hidden', v!=='promos');
   if(v==='home') loadDashboard();
   if(v==='pages') loadPages();
   if(v==='orders') loadOrders();
+  if(v==='promos') loadPromos();
 }));
 
 let chartProd=null, chartTime=null;
@@ -487,6 +509,42 @@ $('#saveShip').addEventListener('click',async()=>{
   if(error){ st.textContent='خطأ: '+error.message; st.style.color='#e79bab'; return; }
   st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
 });
+
+async function loadPromos(){
+  const box=$('#promosList'); if(!box) return; box.innerHTML='<div class="hint">جارٍ التحميل…</div>';
+  const { data, error }=await supabase.from('promos').select('*').order('created_at',{ascending:false});
+  if(error){ box.innerHTML='<div class="empty">تعذّر التحميل: '+esc(error.message)+'</div>'; return; }
+  if(!data||!data.length){ box.innerHTML='<div class="empty">لا توجد أكواد بعد.</div>'; return; }
+  box.innerHTML='<table><thead><tr><th>الكود</th><th>الخصم</th><th>حدّ أدنى</th><th>الحالة</th><th>الانتهاء</th><th></th></tr></thead><tbody>'+
+    data.map(p=>{
+      const disc=p.type==='percent'?(p.value+'٪'):sar(p.value);
+      const st=p.active?'<span style="color:var(--emerald)">مُفعّل</span>':'<span style="color:#e79bab">موقوف</span>';
+      const exp=p.expires_at?new Date(p.expires_at).toLocaleDateString('en-GB'):'—';
+      return '<tr><td style="font-family:monospace;letter-spacing:1px;color:var(--gold-soft)">'+esc(p.code)+'</td><td>'+disc+'</td><td>'+sar(p.min_subtotal)+'</td><td>'+st+'</td><td>'+exp+'</td>'+
+        '<td style="display:flex;gap:6px;justify-content:flex-end"><button data-toggle="'+esc(p.code)+'" data-active="'+(p.active?'1':'0')+'">'+(p.active?'إيقاف':'تفعيل')+'</button>'+
+        '<button class="btn-danger" data-del="'+esc(p.code)+'">حذف</button></td></tr>';
+    }).join('')+'</tbody></table>';
+  box.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',async()=>{ if(!confirm('حذف الكود '+b.dataset.del+'؟'))return; await supabase.from('promos').delete().eq('code',b.dataset.del); loadPromos(); }));
+  box.querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',async()=>{ await supabase.from('promos').update({active:b.dataset.active!=='1'}).eq('code',b.dataset.toggle); loadPromos(); }));
+}
+async function addPromo(){
+  const st=$('#prStatus'); st.textContent=''; st.style.color='var(--muted)';
+  const code=$('#prCode').value.trim(); const type=$('#prType').value;
+  const value=parseFloat($('#prValue').value); const min=parseFloat($('#prMin').value)||0;
+  const expV=$('#prExp').value; const active=$('#prActive').checked;
+  if(!code){ st.textContent='أدخل الكود'; st.style.color='#e79bab'; return; }
+  if(isNaN(value)||value<=0){ st.textContent='أدخل قيمة صحيحة'; st.style.color='#e79bab'; return; }
+  if(type==='percent'&&value>100){ st.textContent='النسبة يجب أن تكون ١٠٠ أو أقل'; st.style.color='#e79bab'; return; }
+  const row={code:code,type:type,value:value,min_subtotal:min,active:active,expires_at:expV?new Date(expV+'T23:59:59').toISOString():null};
+  st.textContent='جاري الحفظ...';
+  const { error }=await supabase.from('promos').upsert(row);
+  if(error){ st.textContent='تعذّر الحفظ: '+error.message; st.style.color='#e79bab'; return; }
+  st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
+  $('#prCode').value=''; $('#prValue').value=''; $('#prMin').value=''; $('#prExp').value='';
+  loadPromos();
+}
+$('#prAdd')&&$('#prAdd').addEventListener('click',addPromo);
+$('#prRefresh')&&$('#prRefresh').addEventListener('click',loadPromos);
 
 init();
 </script>
