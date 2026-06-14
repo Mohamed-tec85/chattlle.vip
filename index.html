@@ -869,12 +869,13 @@
   /* ===== mobile/tablet polish ===== */
   .marquee.mq-stop .marquee-track{animation-play-state:paused}
   @media(max-width:760px){
-    .marquee{-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
-    .marquee-track span{font-size:1rem;padding:0 26px}
-    .marquee-track span::before{font-size:.5rem}
-    .marquee-track .mq-neon{font-size:.9rem;padding:4px 12px;margin:0 7px;gap:6px}
-    .marquee-track .mq-neon .mqCode{font-size:.82rem;padding:3px 9px;letter-spacing:1.5px}
-    .marquee-track .mq-neon .mqCopyHint{font-size:.68rem}
+    .marquee{-webkit-mask-image:none;mask-image:none}
+    .marquee-track span{font-size:.92rem;padding:0 12px}
+    .marquee-track span::before{font-size:.44rem;left:-2px}
+    [dir=rtl] .marquee-track span::before{right:-2px;left:auto}
+    .marquee-track .mq-neon{font-size:.8rem;padding:4px 10px;margin:0 6px;gap:5px}
+    .marquee-track .mq-neon .mqCode{font-size:.78rem;padding:3px 8px;letter-spacing:1px}
+    .marquee-track .mq-neon .mqCopyHint{font-size:.64rem}
   }
 </style>
 <script type="application/ld+json">
@@ -992,8 +993,8 @@
 <!-- MARQUEE -->
 <div class="marquee">
   <div class="marquee-track">
-    <span class="mq-neon"><span data-i18n="mq.ship1">Livraison gratuite dès</span> <b class="mqShipAmt">500</b> <span data-i18n="mq.shipCur">SAR</span></span><span class="mq-neon"><span data-i18n="mq.promo1">50 SAR de remise dès 300 SAR —</span> <button type="button" class="mqCode" title="copy">WELCOME</button> <span class="mqCopyHint" data-i18n="mq.copy">Copier le code</span> <span class="mqCopied" aria-live="polite"></span></span><span data-i18n="mq1">Extrait de parfum 30%</span><span data-i18n="mq2">Macération longue</span><span data-i18n="mq3">Édition nocturne</span><span data-i18n="mq4">Fait main à Paris</span>
-    <span class="mq-neon"><span data-i18n="mq.ship1">Livraison gratuite dès</span> <b class="mqShipAmt">500</b> <span data-i18n="mq.shipCur">SAR</span></span><span class="mq-neon"><span data-i18n="mq.promo1">50 SAR de remise dès 300 SAR —</span> <button type="button" class="mqCode" title="copy">WELCOME</button> <span class="mqCopyHint" data-i18n="mq.copy">Copier le code</span> <span class="mqCopied" aria-live="polite"></span></span><span data-i18n="mq1">Extrait de parfum 30%</span><span data-i18n="mq2">Macération longue</span><span data-i18n="mq3">Édition nocturne</span><span data-i18n="mq4">Fait main à Paris</span>
+    <span class="mq-neon"><span data-i18n="mq.ship1">Livraison gratuite dès</span> <b class="mqShipAmt">500</b> <span data-i18n="mq.shipCur">SAR</span></span><span class="mq-neon"><span data-i18n="mq.promo1">50 SAR dès 300 SAR</span> <button type="button" class="mqCode" title="copy">WELCOME</button> <span class="mqCopyHint" data-i18n="mq.copy">Copier le code</span> <span class="mqCopied" aria-live="polite"></span></span><span data-i18n="mq1">Extrait de parfum 30%</span><span data-i18n="mq2">Macération longue</span><span data-i18n="mq3">Édition nocturne</span><span data-i18n="mq4">Fait main à Paris</span>
+    <span class="mq-neon"><span data-i18n="mq.ship1">Livraison gratuite dès</span> <b class="mqShipAmt">500</b> <span data-i18n="mq.shipCur">SAR</span></span><span class="mq-neon"><span data-i18n="mq.promo1">50 SAR dès 300 SAR</span> <button type="button" class="mqCode" title="copy">WELCOME</button> <span class="mqCopyHint" data-i18n="mq.copy">Copier le code</span> <span class="mqCopied" aria-live="polite"></span></span><span data-i18n="mq1">Extrait de parfum 30%</span><span data-i18n="mq2">Macération longue</span><span data-i18n="mq3">Édition nocturne</span><span data-i18n="mq4">Fait main à Paris</span>
   </div>
 </div>
 
@@ -1584,9 +1585,9 @@
     if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);window.__ovDepth=0;}
   window.addEventListener('popstate',function(){applyRoute();});window.applyRoute=applyRoute;
   (function(){var T={
-    fr:{'mq.ship1':'Livraison gratuite dès','mq.shipCur':'SAR','mq.promo1':'50 SAR de remise dès 300 SAR —','mq.copy':'Copier le code'},
-    en:{'mq.ship1':'Free shipping on orders from','mq.shipCur':'SAR','mq.promo1':'50 SAR off orders from 300 SAR —','mq.copy':'Copy code'},
-    ar:{'mq.ship1':'شحن مجّاني للطلبات من','mq.shipCur':'ريال','mq.promo1':'خصم ٥٠ ريال للطلبات من ٣٠٠ ريال —','mq.copy':'انسخ الكود'}
+    fr:{'mq.ship1':'Livraison gratuite dès','mq.shipCur':'SAR','mq.promo1':'50 SAR dès 300 SAR','mq.copy':'Copier le code'},
+    en:{'mq.ship1':'Free shipping over','mq.shipCur':'SAR','mq.promo1':'50 SAR off from 300 SAR','mq.copy':'Copy code'},
+    ar:{'mq.ship1':'شحن مجّاني من','mq.shipCur':'ريال','mq.promo1':'خصم ٥٠ ريال من ٣٠٠ ريال','mq.copy':'انسخ الكود'}
   };['fr','en','ar'].forEach(function(l){if(I18N[l])for(var k in T[l])I18N[l][k]=T[l][k];});})();
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.mqCode');if(!b)return;var code=(b.textContent||'').trim();if(!code)return;
     var done=function(){var fb=b.parentElement&&b.parentElement.querySelector('.mqCopied');if(fb){fb.textContent=(lang==='ar'?'تم النسخ ✓':(lang==='en'?'Copied ✓':'Copié ✓'));setTimeout(function(){fb.textContent='';},2000);}};
