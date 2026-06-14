@@ -787,6 +787,35 @@
   @media(max-width:1180px){.promo-spray{position:static;transform:none;right:auto;width:min(360px,82vw);margin:30px auto 0}}
   @media(prefers-reduced-motion:reduce){.ps-bottle,.ps-pill::after{animation:none}}
 
+  /* ===== Reviews ===== */
+  .pp-reviews{margin-top:30px;padding-top:24px;border-top:1px solid rgba(199,162,74,.22)}
+  .rv-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .rv-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#f3e8c8;margin:0;font-weight:500}
+  .rv-sum{display:flex;align-items:center;gap:8px}
+  .rv-avg-stars{color:#d6b25e;letter-spacing:2px;font-size:1rem}
+  .rv-avg-num{color:#f3e8c8;font-weight:600}
+  .rv-count{color:#9a8f7a;font-size:.85rem}
+  .rv-list{display:flex;flex-direction:column;gap:14px;margin-bottom:18px}
+  .rv-empty{color:#9a8f7a;font-size:.92rem;margin:4px 0}
+  .rv-item{background:rgba(255,255,255,.03);border:1px solid rgba(199,162,74,.14);border-radius:12px;padding:12px 14px}
+  .rv-item-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .rv-item-stars{color:#d6b25e;letter-spacing:1px;font-size:.9rem}
+  .rv-item-name{color:#f3e8c8;font-weight:600;font-size:.92rem}
+  .rv-item-date{color:#8b8170;font-size:.78rem;margin-inline-start:auto}
+  .rv-item-body{color:#c9bfae;font-size:.9rem;line-height:1.6;margin:0}
+  .rv-star{color:#4a4536}.rv-star.on{color:#d6b25e}
+  .rv-toggle{background:none;border:1px solid rgba(199,162,74,.5);color:#e8d9ab;padding:9px 18px;border-radius:30px;cursor:pointer;font-size:.9rem;letter-spacing:.5px;transition:.25s}
+  .rv-toggle:hover{background:rgba(199,162,74,.12)}
+  .rv-form{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+  .rv-stars-input{display:flex;gap:6px;font-size:1.7rem;cursor:pointer;direction:ltr}
+  .rv-stars-input span{color:#4a4536;transition:.15s;line-height:1}
+  .rv-stars-input span.on{color:#d6b25e}
+  .rv-inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(199,162,74,.2);border-radius:10px;color:#f3e8c8;padding:11px 13px;font-family:inherit;font-size:.95rem;box-sizing:border-box}
+  .rv-inp:focus{outline:none;border-color:rgba(199,162,74,.55)}
+  textarea.rv-inp{resize:vertical;min-height:70px}
+  .rv-submit{align-self:flex-start}
+  .rv-msg{font-size:.88rem;margin:2px 0 0}
+  .rv-msg.ok{color:#8fce9b}.rv-msg.err{color:#e0a3a3}
 </style>
 <script type="application/ld+json">
 [
@@ -1122,6 +1151,18 @@
       <div class="pp-actions">
         <a href="#" class="btn btn-fill" id="ppAdd" data-i18n="btn.cart">Ajouter au panier</a>
         
+      </div>
+      <div class="pp-reviews" id="ppReviews">
+        <div class="rv-head"><h3 class="rv-title" data-i18n="rv.title">Avis clients</h3><div class="rv-sum" id="rvSum"></div></div>
+        <div class="rv-list" id="rvList"></div>
+        <button class="rv-toggle" id="rvToggle" type="button" data-i18n="rv.write">&Eacute;crire un avis</button>
+        <form class="rv-form" id="rvForm" hidden>
+          <div class="rv-stars-input" id="rvStarsInput" role="radiogroup" aria-label="rating"><span data-v="1">&#9733;</span><span data-v="2">&#9733;</span><span data-v="3">&#9733;</span><span data-v="4">&#9733;</span><span data-v="5">&#9733;</span></div>
+          <input type="text" id="rvName" class="rv-inp" maxlength="60" data-i18n-ph="rv.name" placeholder="Votre nom">
+          <textarea id="rvBody" class="rv-inp" rows="3" maxlength="600" data-i18n-ph="rv.body" placeholder="Votre avis"></textarea>
+          <button type="submit" class="btn btn-fill rv-submit" data-i18n="rv.submit">Publier</button>
+          <p class="rv-msg" id="rvMsg"></p>
+        </form>
       </div>
     </div>
   </div>
@@ -1473,10 +1514,45 @@
     pp.num.textContent='N° '+RN[id];pp.type.textContent=d[id+'.type'];pp.name.innerHTML=d[id+'.name'];pp.desc.textContent=d[id+'.desc'];
     pp.story.textContent=PDESC[lang][id];
     pp.top.textContent=py.t;pp.heart.textContent=py.h;pp.base.textContent=py.b;pp.price.textContent=PRICE[id];}
-  function openProduct(id){fillProduct(id);productPage.classList.add('open');productPage.setAttribute('aria-hidden','false');
+  function openProduct(id){fillProduct(id);if(typeof rvOpen==='function')rvOpen(id);productPage.classList.add('open');productPage.setAttribute('aria-hidden','false');
     document.body.classList.add('pp-open');document.body.style.overflow='hidden';productPage.scrollTop=0;}
   function closeProduct(){productPage.classList.remove('open');productPage.setAttribute('aria-hidden','true');
     document.body.classList.remove('pp-open');document.body.style.overflow='';curProd=null;}
+  /* ===== Real customer reviews ===== */
+  (function(){var T={fr:{'rv.title':'Avis clients','rv.write':'\u00c9crire un avis','rv.name':'Votre nom','rv.body':'Votre avis (optionnel)','rv.submit':'Publier mon avis'},en:{'rv.title':'Customer reviews','rv.write':'Write a review','rv.name':'Your name','rv.body':'Your review (optional)','rv.submit':'Submit review'},ar:{'rv.title':'\u062a\u0642\u064a\u064a\u0645\u0627\u062a \u0627\u0644\u0639\u0645\u0644\u0627\u0621','rv.write':'\u0627\u0643\u062a\u0628 \u062a\u0642\u064a\u064a\u0645\u0627\u064b','rv.name':'\u0627\u0633\u0645\u0643','rv.body':'\u062a\u0642\u064a\u064a\u0645\u0643 (\u0627\u062e\u062a\u064a\u0627\u0631\u064a)','rv.submit':'\u0623\u0631\u0633\u0644 \u062a\u0642\u064a\u064a\u0645\u064a'}};['fr','en','ar'].forEach(function(l){if(I18N[l])for(var k in T[l])I18N[l][k]=T[l][k];});})();
+  var rvRating=0;
+  function rvStarsHTML(n){var s='';for(var i=1;i<=5;i++){s+='<span class="rv-star'+(i<=n?' on':'')+'">\u2605</span>';}return s;}
+  function rvEsc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function rvL(ar,en,fr){return lang==='ar'?ar:(lang==='en'?en:fr);}
+  function rvPaintStars(){var box=document.getElementById('rvStarsInput');if(!box)return;box.querySelectorAll('span').forEach(function(s){s.classList.toggle('on',(+s.dataset.v)<=rvRating);});}
+  function rvOpen(id){rvRating=0;var f=document.getElementById('rvForm');if(f)f.hidden=true;var m=document.getElementById('rvMsg');if(m){m.textContent='';m.className='rv-msg';}var n=document.getElementById('rvName'),b=document.getElementById('rvBody');if(n)n.value='';if(b)b.value='';rvPaintStars();rvLoad(id);}
+  function rvLoad(id){var list=document.getElementById('rvList'),sum=document.getElementById('rvSum');if(!list||!sum)return;
+    list.innerHTML='<p class="rv-empty">'+rvL('\u062c\u0627\u0631\u064d \u0627\u0644\u062a\u062d\u0645\u064a\u0644\u2026','Loading\u2026','Chargement\u2026')+'</p>';sum.innerHTML='';
+    var ref=(window.__PRODID&&window.__PRODID[id]!=null)?String(window.__PRODID[id]):'';var sb=window.__sb;
+    if(!ref||!sb){list.innerHTML='<p class="rv-empty">'+rvL('\u0644\u0627 \u062a\u0648\u062c\u062f \u062a\u0642\u064a\u064a\u0645\u0627\u062a \u0628\u0639\u062f','No reviews yet','Aucun avis')+'</p>';return;}
+    sb.from('reviews').select('author,rating,body,created_at').eq('product_ref',ref).eq('status','approved').order('created_at',{ascending:false}).then(function(r){
+      var rows=(r&&r.data)||[];
+      if(!rows.length){sum.innerHTML='';list.innerHTML='<p class="rv-empty">'+rvL('\u0643\u0646 \u0623\u0648\u0651\u0644 \u0645\u0646 \u064a\u0642\u064a\u0651\u0645 \u0647\u0630\u0627 \u0627\u0644\u0639\u0637\u0631','Be the first to review this fragrance','Soyez le premier \u00e0 donner un avis')+'</p>';return;}
+      var sv=0;rows.forEach(function(x){sv+=x.rating;});var avg=sv/rows.length;
+      sum.innerHTML='<span class="rv-avg-stars">'+rvStarsHTML(Math.round(avg))+'</span><span class="rv-avg-num">'+avg.toFixed(1)+'</span><span class="rv-count">('+rows.length+')</span>';
+      list.innerHTML=rows.map(function(x){var d=x.created_at?new Date(x.created_at):null;var ds='';try{ds=d?d.toLocaleDateString(lang==='ar'?'ar':(lang==='en'?'en-US':'fr-FR'),{year:'numeric',month:'short',day:'numeric'}):'';}catch(e){ds='';}
+        return '<div class="rv-item"><div class="rv-item-top"><span class="rv-item-stars">'+rvStarsHTML(x.rating)+'</span><span class="rv-item-name">'+rvEsc(x.author)+'</span><span class="rv-item-date">'+ds+'</span></div>'+(x.body?'<p class="rv-item-body">'+rvEsc(x.body)+'</p>':'')+'</div>';}).join('');
+    }).catch(function(){list.innerHTML='<p class="rv-empty">'+rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u062a\u062d\u0645\u064a\u0644','Could not load reviews','Erreur de chargement')+'</p>';});}
+  function rvSubmit(){var msg=document.getElementById('rvMsg');var set=function(t,c){if(msg){msg.textContent=t;msg.className='rv-msg '+(c||'');}};
+    var nm=((document.getElementById('rvName')||{}).value||'').trim(),bd=((document.getElementById('rvBody')||{}).value||'').trim();
+    if(!rvRating){set(rvL('\u0627\u062e\u062a\u0631 \u062a\u0642\u064a\u064a\u0645\u0627\u064b \u0628\u0627\u0644\u0646\u062c\u0648\u0645','Please pick a star rating','Choisissez une note'),'err');return;}
+    if(!nm){set(rvL('\u0623\u062f\u062e\u0644 \u0627\u0633\u0645\u0643','Enter your name','Entrez votre nom'),'err');return;}
+    var id=curProd;var ref=(window.__PRODID&&window.__PRODID[id]!=null)?String(window.__PRODID[id]):'';var pname=(window.__PNAME&&window.__PNAME[id])||'';var sb=window.__sb;
+    if(!ref||!sb){set(rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644','Could not submit','Erreur'),'err');return;}
+    set(rvL('\u062c\u0627\u0631\u064d \u0627\u0644\u0625\u0631\u0633\u0627\u0644\u2026','Sending\u2026','Envoi\u2026'),'');
+    sb.from('reviews').insert({product_ref:ref,product_name:pname,author:nm,rating:rvRating,body:bd,status:'pending'}).then(function(r){
+      if(r&&r.error){set(rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644','Could not submit','Erreur'),'err');return;}
+      set(rvL('\u0634\u0643\u0631\u0627\u064b! \u0633\u064a\u0638\u0647\u0631 \u062a\u0642\u064a\u064a\u0645\u0643 \u0628\u0639\u062f \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629','Thank you! Your review will appear after approval','Merci ! Votre avis sera publi\u00e9 apr\u00e8s validation'),'ok');
+      rvRating=0;rvPaintStars();var nme=document.getElementById('rvName'),bde=document.getElementById('rvBody'),f=document.getElementById('rvForm');if(nme)nme.value='';if(bde)bde.value='';setTimeout(function(){if(f)f.hidden=true;},2600);
+    }).catch(function(){set(rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644','Could not submit','Erreur'),'err');});}
+  (function(){var box=document.getElementById('rvStarsInput');if(box)box.addEventListener('click',function(e){var s=e.target.closest('span');if(!s)return;rvRating=+s.dataset.v||0;rvPaintStars();});
+    var tog=document.getElementById('rvToggle'),f=document.getElementById('rvForm');if(tog&&f)tog.addEventListener('click',function(){f.hidden=!f.hidden;if(!f.hidden){var n=document.getElementById('rvName');if(n)n.focus();}});
+    if(f)f.addEventListener('submit',function(e){e.preventDefault();rvSubmit();});})();
   productPage.querySelectorAll('.pp-actions .btn').forEach(b=>b.addEventListener('click',e=>e.preventDefault()));
   document.getElementById('ppBack').addEventListener('click',closeProduct);
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&curProd)closeProduct();});
@@ -1741,7 +1817,7 @@
       });
       if(typeof PRICE!=='undefined') PRICE[id]=ptxt;
       if(typeof RN!=='undefined') RN[id]=roman;
-      const url=p.image_url||DEF; imgMap[id]=url; pamt[id]=(p.price_amount!=null)?p.price_amount:'';
+      const url=p.image_url||DEF; imgMap[id]=url; pamt[id]=(p.price_amount!=null)?p.price_amount:''; window.__PRODID=window.__PRODID||{};window.__PNAME=window.__PNAME||{};window.__PIMG=window.__PIMG||{};window.__PAMT=window.__PAMT||{};window.__PRODID[id]=p.id;window.__PNAME[id]=p['name_ar']||p['name_en']||p['name_fr']||('CHATTLLE '+roman);window.__PIMG[id]=(p.image_url&&/^https?:/.test(p.image_url))?p.image_url:'';window.__PAMT[id]=(p.price_amount!=null)?Number(p.price_amount):null;
 
       const card=document.createElement('div');
       card.className='col-card reveal';
@@ -1789,6 +1865,25 @@
     featureCard('r4.name','r4');
 
     try{ const ss=await sb.from('settings').select('*'); if(ss&&ss.data){ const SM={}; ss.data.forEach(function(r){SM[r.key]=r;}); if(SM['col_h2']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['col_h2']['value_'+l]) I18N[l]['col.h2']=SM['col_h2']['value_'+l]; }); } if(SM['shipping']){ window.__SHIP={cost:Number(SM['shipping'].value_fr)||0, freeOver:Number(SM['shipping'].value_en)||0}; } if(SM['promo_banner']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['promo_banner']['value_'+l]) I18N[l]['pbanner.text']=SM['promo_banner']['value_'+l]; }); } var _pbc=SM['promo_banner_cfg']; var _pse=document.getElementById('promoSpray'),_psp=document.getElementById('promoSprayPill'); if(_pse){ _pse.style.display=(!_pbc||_pbc.value_en!=='0')?'':'none'; } if(_psp&&_pbc){ if(_pbc.value_fr){_psp.textContent=_pbc.value_fr;_psp.style.display='';}else{_psp.style.display='none';} } } }catch(e){}
+    (function(){try{var sb=window.__sb;if(!sb)return;
+      sb.from('reviews').select('product_ref,author,rating,body').eq('status','approved').then(function(r){
+        var rows=(r&&r.data)||[];if(!rows.length)return;
+        var byRef={};rows.forEach(function(x){(byRef[x.product_ref]=byRef[x.product_ref]||[]).push(x);});
+        var idByRef={},pid=window.__PRODID||{};for(var k in pid){idByRef[String(pid[k])]=k;}
+        var graph=[];for(var ref in byRef){var arr=byRef[ref],rid=idByRef[ref];if(!rid)continue;
+          var nm=(window.__PNAME&&window.__PNAME[rid])||'CHATTLLE',img=(window.__PIMG&&window.__PIMG[rid])||'',amt=(window.__PAMT&&window.__PAMT[rid]);
+          var s=0;arr.forEach(function(x){s+=x.rating;});var avg=s/arr.length;
+          var prod={"@type":"Product","name":nm,"brand":{"@type":"Brand","name":"CHATTLLE"},
+            "url":((location&&location.origin)||"https://chattlle.vip")+"/#"+rid,
+            "aggregateRating":{"@type":"AggregateRating","ratingValue":Number(avg.toFixed(1)),"reviewCount":arr.length,"bestRating":5,"worstRating":1},
+            "review":arr.slice(0,8).map(function(x){return {"@type":"Review","author":{"@type":"Person","name":x.author||"Client"},"reviewRating":{"@type":"Rating","ratingValue":x.rating,"bestRating":5,"worstRating":1},"reviewBody":x.body||""};})};
+          if(img)prod.image=img;
+          if(amt!=null)prod.offers={"@type":"Offer","price":amt,"priceCurrency":"SAR","availability":"https://schema.org/InStock","url":prod.url};
+          graph.push(prod);}
+        if(!graph.length)return;
+        var el=document.getElementById('rvLD');if(!el){el=document.createElement('script');el.type='application/ld+json';el.id='rvLD';document.head.appendChild(el);}
+        el.textContent=JSON.stringify({"@context":"https://schema.org","@graph":graph});
+      }).catch(function(){});}catch(e){}})();
     try{ const pg=await sb.from('pages').select('*'); if(pg&&pg.data&&window.__INFO){ pg.data.forEach(function(r){ window.__INFO[r.key]={fr:{t:r.title_fr||'',b:r.body_fr||''},en:{t:r.title_en||'',b:r.body_en||''},ar:{t:r.title_ar||'',b:r.body_ar||''}}; }); } }catch(e){}
     applyLang(typeof lang!=='undefined'?lang:'fr');
   }catch(e){ /* keep built-in defaults */ }
