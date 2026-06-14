@@ -704,17 +704,22 @@
     .foot-grid{grid-template-columns:1fr}
   }
 
-  /* ===== 3D product details frame ===== */
-  .pp-body{perspective:1700px}
-  .pp-info{transform-style:preserve-3d;
-    background:linear-gradient(155deg,rgba(199,162,74,.07),rgba(255,255,255,.012) 42%,rgba(10,15,12,.28));
-    border:1px solid rgba(199,162,74,.2);border-radius:12px;padding:34px 32px;
-    box-shadow:0 36px 80px rgba(0,0,0,.55),0 0 0 1px rgba(199,162,74,.06),inset 0 1px 0 rgba(255,243,207,.06),inset 0 0 50px rgba(199,162,74,.05);
-    transform:rotateY(-7deg);transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .6s}
-  [dir=rtl] .pp-info{transform:rotateY(7deg)}
-  .pp-info:hover{transform:rotateY(0deg);
-    box-shadow:0 46px 92px rgba(0,0,0,.62),0 0 0 1px rgba(199,162,74,.3),inset 0 0 64px rgba(199,162,74,.08)}
-  @media(max-width:860px){.pp-info{transform:none!important;padding:26px 22px}}
+  /* ===== spec-plaque product details frame (HUD corners, no tilt) ===== */
+  .pp-body{perspective:none}
+  .pp-info{position:relative;transform:none;
+    background:linear-gradient(150deg,rgba(22,19,12,.66),rgba(8,8,8,.82));
+    border:1px solid rgba(199,162,74,.34);border-radius:5px;padding:44px 40px;
+    box-shadow:0 30px 70px rgba(0,0,0,.55),inset 0 0 64px rgba(199,162,74,.055),inset 0 1px 0 rgba(255,243,207,.05)}
+  .pp-name{text-shadow:0 0 24px rgba(199,162,74,.22)}
+  .pp-cnr{position:absolute;width:27px;height:27px;border:2px solid var(--gold-soft);pointer-events:none;box-shadow:0 0 9px rgba(199,162,74,.45)}
+  .pp-cnr.tl{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .pp-cnr.tr{top:-1px;right:-1px;border-left:0;border-bottom:0}
+  .pp-cnr.bl{bottom:-1px;left:-1px;border-right:0;border-top:0}
+  .pp-cnr.br{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .pp-cnr.tl::after{content:"";position:absolute;top:5px;left:31px;width:40px;height:6px;background:repeating-linear-gradient(90deg,var(--gold-soft) 0 5px,transparent 5px 9px);opacity:.55}
+  .pp-cnr.tr::after{content:"";position:absolute;top:6px;right:31px;width:26px;height:9px;background:repeating-linear-gradient(0deg,var(--gold-soft) 0 1px,transparent 1px 4px);opacity:.55}
+  .pp-info::after{content:"\2022 \2022 \2022";position:absolute;bottom:8px;left:50%;transform:translateX(-50%);color:var(--gold-soft);font-size:11px;letter-spacing:3px;opacity:.5;pointer-events:none}
+  @media(max-width:860px){.pp-info{padding:32px 22px}.pp-cnr{width:20px;height:20px}.pp-cnr.tl::after,.pp-cnr.tr::after{display:none}}
 
   /* ===== elegant product details (global-perfume feel) ===== */
   .pp-body{gap:70px}
@@ -788,7 +793,12 @@
   @media(prefers-reduced-motion:reduce){.ps-bottle,.ps-pill::after{animation:none}}
 
   /* ===== Reviews ===== */
-  .pp-reviews{margin-top:30px;padding-top:24px;border-top:1px solid rgba(199,162,74,.22)}
+  .pp-reviews{position:relative;width:min(1080px,90vw);margin:6px auto 96px;padding:40px clamp(22px,5vw,54px);border-radius:16px;
+    background:radial-gradient(130% 72% at 50% -8%,rgba(199,162,74,.16),transparent 55%),linear-gradient(162deg,rgba(30,26,16,.74),rgba(8,8,8,.88));
+    border:1px solid rgba(199,162,74,.32);
+    box-shadow:0 46px 92px rgba(0,0,0,.6),0 16px 40px rgba(0,0,0,.5),0 0 52px rgba(199,162,74,.14),inset 0 1px 0 rgba(255,243,207,.09),inset 0 0 72px rgba(199,162,74,.05)}
+  .pp-reviews::before{content:"";position:absolute;left:10%;right:10%;top:-1px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);box-shadow:0 0 14px rgba(199,162,74,.6)}
+  @media(max-width:860px){.pp-reviews{margin:0 auto 72px;padding:30px 20px}}
   .rv-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .rv-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#f3e8c8;margin:0;font-weight:500}
   .rv-sum{display:flex;align-items:center;gap:8px}
@@ -1133,7 +1143,7 @@
     <div class="pp-visual">
       <div class="cc-stage pp-stage"><span class="cc-glow"></span><span class="cc-glass"></span><div class="cc-still"><img class="cc-bottle" alt=""><img class="cc-bottle-ref" alt="" aria-hidden="true"></div></div>
     </div>
-    <div class="pp-info">
+    <div class="pp-info"><span class="pp-cnr tl"></span><span class="pp-cnr tr"></span><span class="pp-cnr bl"></span><span class="pp-cnr br"></span>
       <div class="pp-kicker"><span class="pp-num" id="ppNum">N° I</span><span class="ri-type" id="ppType"></span></div>
       <h2 class="pp-name" id="ppName"></h2>
       <span class="pp-rule"></span>
@@ -1152,6 +1162,8 @@
         <a href="#" class="btn btn-fill" id="ppAdd" data-i18n="btn.cart">Ajouter au panier</a>
         
       </div>
+    </div>
+  </div>
       <div class="pp-reviews" id="ppReviews">
         <div class="rv-head"><h3 class="rv-title" data-i18n="rv.title">Avis clients</h3><div class="rv-sum" id="rvSum"></div></div>
         <div class="rv-list" id="rvList"></div>
@@ -1164,8 +1176,6 @@
           <p class="rv-msg" id="rvMsg"></p>
         </form>
       </div>
-    </div>
-  </div>
 </div>
 
 <!-- MOBILE MENU -->
