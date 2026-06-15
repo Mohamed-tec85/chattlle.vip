@@ -20,14 +20,18 @@
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="googlebot" content="index, follow">
 <meta name="theme-color" content="#0a0f0c">
-<link rel="canonical" href="https://chattlle.vip/">
+<link rel="canonical" href="https://chattlle.vip/" id="canon">
+<link rel="alternate" hreflang="x-default" href="https://chattlle.vip/" id="hrefDef">
+<link rel="alternate" hreflang="fr" href="https://chattlle.vip/" id="hrefFr">
+<link rel="alternate" hreflang="en" href="https://chattlle.vip/?lang=en" id="hrefEn">
+<link rel="alternate" hreflang="ar" href="https://chattlle.vip/?lang=ar" id="hrefAr">
 
 <!-- ===== Open Graph (WhatsApp, Facebook, LinkedIn) ===== -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CHATTLLE">
 <meta property="og:title" content="CHATTLLE — عطور الليل النادرة">
 <meta property="og:description" content="دار CHATTLLE لعطور الليل النادرة — مستخلصات عطرية بتركيز ٣٠٪ تُصنع يدويًا في باريس. روائح ليلية كثيفة وثابتة، لمن لا يظهرون إلا بعد غياب الشمس.">
-<meta property="og:url" content="https://chattlle.vip/">
+<meta property="og:url" content="https://chattlle.vip/" id="ogurl">
 <meta property="og:image" content="https://chattlle.vip/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -1457,7 +1461,8 @@
     ]
   };
 
-  let lang="fr";
+  let lang=(function(){try{var q=new URLSearchParams(location.search).get("lang");return(q==="en"||q==="ar"||q==="fr")?q:"fr";}catch(e){return"fr";}})();
+  function updateSeoTags(l){try{var o=location.origin||"https://chattlle.vip";var p=location.pathname||"/";var q=(l&&l!=="fr")?("?lang="+l):"";var self=o+p+q;var c=document.getElementById("canon");if(c)c.href=self;var og=document.getElementById("ogurl");if(og)og.setAttribute("content",self);var hd=document.getElementById("hrefDef");if(hd)hd.href=o+p;var hf=document.getElementById("hrefFr");if(hf)hf.href=o+p;var he=document.getElementById("hrefEn");if(he)he.href=o+p+"?lang=en";var ha=document.getElementById("hrefAr");if(ha)ha.href=o+p+"?lang=ar";}catch(e){}}
   const dp={type:document.getElementById('dpType'),name:document.getElementById('dpName'),
             notes:document.getElementById('dpNotes'),size:document.getElementById('dpSize'),price:document.getElementById('dpPrice')};
   const slots=document.querySelectorAll('.slot');
@@ -1498,7 +1503,7 @@
     lang=l;const dict=I18N[l];
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[k]!=null)el.innerHTML=dict[k];});
     document.querySelectorAll('[data-i18n-ph]').forEach(function(ph){var k=ph.getAttribute('data-i18n-ph');if(dict[k]!=null)ph.placeholder=dict[k];});
-    document.documentElement.lang=l;document.documentElement.dir=(l==='ar')?'rtl':'ltr';
+    document.documentElement.lang=l;document.documentElement.dir=(l==='ar')?'rtl':'ltr';try{updateSeoTags(l);}catch(e){}
     document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
     if(activeSlot)fill(activeSlot);else fill(slots[5]); // default panel content = signature
     if(typeof curProd!=='undefined'&&curProd)fillProduct(curProd);
@@ -1585,7 +1590,7 @@
     if(r.t==='product'&&r.key&&typeof PYR!=='undefined'&&PYR[lang]&&PYR[lang][r.key]){if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(curProd!==r.key)openProduct(r.key,true);return;}
     if(r.t==='page'&&r.key&&window.__openInfo){if(curProd)closeProduct(true);if(window.__infoKey!==r.key)window.__openInfo(r.key,true);return;}
     if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);window.__ovDepth=0;}
-  window.addEventListener('popstate',function(){applyRoute();});window.applyRoute=applyRoute;
+  window.addEventListener('popstate',function(){applyRoute();try{updateSeoTags(lang);}catch(e){}});window.applyRoute=applyRoute;
   (function(){var T={
     fr:{'mq.ship1':'Livraison gratuite dès','mq.shipCur':'SAR','mq.promo1':'50 SAR dès 300 SAR','mq.copy':'Copier le code'},
     en:{'mq.ship1':'Free shipping over','mq.shipCur':'SAR','mq.promo1':'50 SAR off from 300 SAR','mq.copy':'Copy code'},
@@ -1965,7 +1970,7 @@
         el.textContent=JSON.stringify({"@context":"https://schema.org","@graph":graph});
       }).catch(function(){});}catch(e){}})();
     try{ const pg=await sb.from('pages').select('*'); if(pg&&pg.data&&window.__INFO){ pg.data.forEach(function(r){ window.__INFO[r.key]={fr:{t:r.title_fr||'',b:r.body_fr||''},en:{t:r.title_en||'',b:r.body_en||''},ar:{t:r.title_ar||'',b:r.body_ar||''}}; }); } }catch(e){}
-    applyLang(typeof lang!=='undefined'?lang:'fr');try{if(window.applyRoute)window.applyRoute();}catch(e){}
+    applyLang(typeof lang!=='undefined'?lang:'fr');try{if(window.applyRoute)window.applyRoute();}catch(e){}try{updateSeoTags(typeof lang!=='undefined'?lang:'fr');}catch(e){}
   }catch(e){ /* keep built-in defaults */ }
 })();
 </script>

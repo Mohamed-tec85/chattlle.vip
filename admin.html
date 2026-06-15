@@ -227,6 +227,7 @@
       <div class="dash-head">
         <h2 style="margin:0;color:var(--gold-soft);font-size:18px">⚡ الفهرسة الفورية — IndexNow</h2>
         <button id="idxBtn">🚀 إرسال كل الصفحات الآن</button>
+        <button id="smBtn" style="margin-inline-start:8px">🗺️ تنزيل sitemap.xml</button>
       </div>
       <div id="idxStatus" style="margin:10px 0;min-height:20px;color:var(--gold-soft);font-size:14px"></div>
       <div class="card">
@@ -280,6 +281,25 @@ async function idxSubmit(){
   btn.disabled=false;
 }
 $('#idxBtn')&&$('#idxBtn').addEventListener('click',idxSubmit);
+async function genSitemap(){
+  const st=$('#idxStatus'); st.textContent='جاري توليد sitemap…';
+  try{
+    const today=new Date().toISOString().slice(0,10);
+    const u=[{loc:IDX_SITE+'/',pr:'1.0',cf:'weekly',alt:true}];
+    const {data:prods}=await supabase.from('products').select('id,name_fr,name_en,name_ar,active').eq('active',true);
+    (prods||[]).forEach(p=>{let sg=idxSlug(p.name_fr||p.name_en||p.name_ar);if(!sg)sg=p.id;u.push({loc:IDX_SITE+'/produit/'+sg,pr:'0.8',cf:'weekly',alt:true});});
+    const {data:pgs}=await supabase.from('pages').select('key');
+    (pgs||[]).forEach(p=>{if(p.key)u.push({loc:IDX_SITE+'/page/'+encodeURIComponent(p.key),pr:'0.5',cf:'monthly',alt:false});});
+    let xml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
+    u.forEach(x=>{xml+='  <url>\n    <loc>'+x.loc+'</loc>\n';
+      if(x.alt){const j=x.loc.indexOf('?')>=0?'&':'?';xml+='    <xhtml:link rel="alternate" hreflang="x-default" href="'+x.loc+'"/>\n    <xhtml:link rel="alternate" hreflang="fr" href="'+x.loc+'"/>\n    <xhtml:link rel="alternate" hreflang="en" href="'+x.loc+j+'lang=en"/>\n    <xhtml:link rel="alternate" hreflang="ar" href="'+x.loc+j+'lang=ar"/>\n';}
+      xml+='    <lastmod>'+today+'</lastmod>\n    <changefreq>'+x.cf+'</changefreq>\n    <priority>'+x.pr+'</priority>\n  </url>\n';});
+    xml+='</urlset>\n';
+    const blob=new Blob([xml],{type:'application/xml'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sitemap.xml';document.body.appendChild(a);a.click();a.remove();
+    st.innerHTML='✅ تم توليد sitemap.xml ('+u.length+' رابط). ارفعه إلى جذر الموقع ليحلّ محلّ القديم.';
+  }catch(e){st.textContent='تعذّر التوليد: '+(e&&e.message?e.message:e);}
+}
+$('#smBtn')&&$('#smBtn').addEventListener('click',genSitemap);
 const sar=n=>(Number(n)||0).toLocaleString('en-US',{maximumFractionDigits:2})+' ر.س';
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
