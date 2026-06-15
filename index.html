@@ -287,14 +287,14 @@
   @media(max-width:620px){.stage3d{width:94vw;height:46vh}.slot{width:138px;height:194px;margin:-97px 0 0 -69px;--r:min(42vw,158px)}}
 
   /* MARQUEE */
-  .marquee{position:relative;overflow:hidden;padding:17px 0;
+  .marquee{position:relative;overflow:hidden;padding:17px 0;direction:ltr;
     background:linear-gradient(180deg,rgba(15,24,19,.55),rgba(9,14,11,.92));
     -webkit-mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent);
             mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent)}
   .marquee::before,.marquee::after{content:"";position:absolute;left:0;right:0;height:1px;z-index:2;
     background:linear-gradient(90deg,transparent,var(--gold) 28%,var(--gold) 72%,transparent);opacity:.5}
   .marquee::before{top:0}.marquee::after{bottom:0}
-  .marquee-track{display:flex;align-items:center;white-space:nowrap;animation:scroll 64s linear infinite;width:max-content}
+  .marquee-track{display:flex;align-items:center;white-space:nowrap;animation:scroll 64s linear infinite;width:max-content;direction:ltr}
   .marquee-track span{position:relative;display:inline-flex;align-items:center;padding:0 46px;
     font-family:var(--display);font-style:italic;font-size:1.32rem;letter-spacing:.01em;color:var(--cream);opacity:.92}
   .marquee-track span:nth-child(even){color:var(--gold-soft);opacity:1}
@@ -877,6 +877,8 @@
     .marquee-track .mq-neon .mqCode{font-size:.78rem;padding:3px 8px;letter-spacing:1px}
     .marquee-track .mq-neon .mqCopyHint{font-size:.64rem}
   }
+  .marquee-track>span:not(.mq-neon){unicode-bidi:plaintext}
+  [dir=rtl] .marquee-track .mq-neon{direction:rtl}
 </style>
 <script type="application/ld+json">
 [
