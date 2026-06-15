@@ -925,6 +925,22 @@
   .pp-sold[hidden]{display:none!important}
   .cc-sold[hidden]{display:none!important}
   .btn.pp-disabled{opacity:.4;pointer-events:none;filter:grayscale(.4)}
+  .bundle-stage{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:200px;margin-bottom:16px}
+  .bundle-stage .bmini{position:relative;display:flex;align-items:flex-end;justify-content:center}
+  .bundle-stage .bmini img{height:128px;width:auto;object-fit:contain;filter:drop-shadow(0 14px 16px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(224,201,132,.18));animation:ppFloat 5.5s ease-in-out infinite}
+  .bundle-stage .bmini:nth-child(2) img{height:156px;animation-delay:.4s}
+  .bundle-stage .bmini:nth-child(3) img{animation-delay:.8s}
+  .bundle-card.sold-out .bmini img{opacity:.45;filter:grayscale(.35)}
+  .bundle-card .ri-price s{color:var(--muted);opacity:.7;margin-inline-start:8px;font-size:.82em;font-weight:400}
+  .bundle-stage-lg{height:300px;gap:8px}
+  .bundle-stage-lg .bmini img{height:196px}
+  .bundle-stage-lg .bmini:nth-child(2) img{height:236px}
+  .bp-list{margin:14px 0;display:flex;flex-direction:column;gap:2px}
+  .bp-item{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .bp-item .bp-nm{color:var(--cream)}.bp-item .bp-ty{color:var(--muted);font-size:12px;margin-inline-start:8px}
+  .bp-item .bp-pr{color:var(--gold-soft);white-space:nowrap}
+  .bp-save{margin:8px 0 2px;color:#6fcf97;font-size:15px}
+  @media(max-width:860px){.bundle-stage-lg{height:220px}.bundle-stage-lg .bmini img{height:146px}.bundle-stage-lg .bmini:nth-child(2) img{height:176px}}
 </style>
 <script type="application/ld+json">
 [
@@ -1126,6 +1142,17 @@
   </div>
 </section>
 
+<!-- OFFERS / BUNDLES -->
+<section class="collection" id="offers" hidden>
+  <div class="sec-head reveal">
+    <div class="coll-frame">
+      <span class="label" data-i18n="offers.label">Coffrets CHATTLLE</span>
+      <h2 data-i18n="offers.h2">Trios en <em>édition offre</em></h2>
+    </div>
+  </div>
+  <div class="col-grid bundle-grid" id="bundleGrid" style="max-width:900px"></div>
+</section>
+
 <!-- STORY -->
 <section class="story" id="story">
   <div class="story-inner reveal">
@@ -1291,6 +1318,33 @@
       </div>
 </div>
 
+<!-- BUNDLE PAGE -->
+<div class="product-page" id="bundlePage" aria-hidden="true">
+  <div class="pp-top">
+    <div class="pp-brand"><img class="brand-logo pp-logo" alt=""><span>CHATTLLE</span></div>
+    <button class="pp-back" id="bpBack" type="button"><span class="ppb-arrow">&#8592;</span><span data-i18n="pp.back">Retour</span></button>
+  </div>
+  <div class="pp-body">
+    <div class="pp-visual">
+      <div class="bundle-stage bundle-stage-lg" id="bpStage"></div>
+    </div>
+    <div class="pp-info"><span class="pp-cnr tl"></span><span class="pp-cnr tr"></span><span class="pp-cnr bl"></span><span class="pp-cnr br"></span>
+      <div class="pp-kicker"><span class="ri-type" data-i18n="offers.label">Coffret</span></div>
+      <h2 class="pp-name" id="bpName"></h2>
+      <span class="pp-rule"></span>
+      <p class="pp-desc" id="bpDesc"></p>
+      <span class="pp-story-label" data-i18n="bundle.includes">Ce coffret comprend</span>
+      <div class="bp-list" id="bpList"></div>
+      <div class="bp-save" id="bpSave"></div>
+      <div class="pp-buy"><span class="price pp-price" id="bpPrice"></span></div>
+      <div class="pp-actions">
+        <a href="#" class="btn btn-fill" id="bpAdd" data-i18n="bundle.add">Ajouter le coffret</a>
+        <span class="pp-sold" id="bpSold" data-i18n="stock.out" hidden>Épuisé</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
   <button class="mm-close" id="mmClose" aria-label="Close">&times;</button>
@@ -1408,7 +1462,7 @@
       "feat.label":"Le parfum signature","feat.name":"L'Heure Pourpre","feat.h2":"L'Heure <em>Pourpre</em>",
       "feat.p":"L'instant exact où le ciel bascule du rouge au noir. Une ouverture de cardamome et de poivre noir, un cœur d'iris et de cuir, puis un fond profond de oud, d'encens et de musc animal qui s'attarde sur la peau jusqu'à l'aube.",
       "n.cardamom":"Cardamome","n.iris":"Iris","n.leather":"Cuir","n.oud":"Oud","n.incense":"Encens","n.musk":"Musc",
-      "feat.unit":"/ Extrait 100 ml","btn.cart":"Ajouter au panier","stock.out":"Épuisé","feat.sample":"Échantillon · 9 ر.س",
+      "feat.unit":"/ Extrait 100 ml","btn.cart":"Ajouter au panier","stock.out":"Épuisé","offers.label":"Coffrets CHATTLLE","offers.h2":"Trios en <em>édition offre</em>","cta.bundle":"Découvrir le coffret","bundle.add":"Ajouter le coffret","bundle.includes":"Ce coffret comprend","bundle.save":"Vous économisez","feat.sample":"Échantillon · 9 ر.س",
       "col.label":"La Collection CHATTLLE","col.h2":"Neuf parfums, neuf <em>heures de la nuit</em>","cta.discover":"Découvrir",
       "r1.type":"Boisé · Fumé","r1.name":"Velours Noir","r1.desc":"Vétiver fumé, bois de gaïac et une volute de tabac blond.",
       "r2.type":"Ambré · Oriental","r2.name":"Ambre Sombre","r2.desc":"Ambre gris, benjoin et vanille noire enveloppés de résines.",
@@ -1441,7 +1495,7 @@
       "feat.label":"The signature scent","feat.name":"The Crimson Hour","feat.h2":"The <em>Crimson</em> Hour",
       "feat.p":"The exact moment the sky tips from red to black. An opening of cardamom and black pepper, a heart of iris and leather, then a deep base of oud, incense and animalic musk that lingers on the skin until dawn.",
       "n.cardamom":"Cardamom","n.iris":"Iris","n.leather":"Leather","n.oud":"Oud","n.incense":"Incense","n.musk":"Musk",
-      "feat.unit":"/ Extract 100 ml","btn.cart":"Add to cart","stock.out":"Sold out","feat.sample":"Sample · 9 ر.س",
+      "feat.unit":"/ Extract 100 ml","btn.cart":"Add to cart","stock.out":"Sold out","offers.label":"CHATTLLE Sets","offers.h2":"Trios in <em>offer edition</em>","cta.bundle":"Discover the set","bundle.add":"Add the set","bundle.includes":"This set includes","bundle.save":"You save","feat.sample":"Sample · 9 ر.س",
       "col.label":"The CHATTLLE Collection","col.h2":"Nine perfumes, nine <em>hours of the night</em>","cta.discover":"Discover",
       "r1.type":"Woody · Smoky","r1.name":"Black Velvet","r1.desc":"Smoked vetiver, guaiac wood and a curl of blond tobacco.",
       "r2.type":"Amber · Oriental","r2.name":"Dark Amber","r2.desc":"Ambergris, benzoin and black vanilla wrapped in resins.",
@@ -1474,7 +1528,7 @@
       "feat.label":"العطر المميّز","feat.name":"ساعةُ الأرجوان","feat.h2":"ساعةُ <em>الأرجوان</em>",
       "feat.p":"اللحظة التي تتحوّل فيها السماء من الأحمر إلى الأسود. افتتاحيةٌ من الهيل والفلفل الأسود، وقلبٌ من السوسن والجلد، ثم قاعدةٌ عميقة من العود والبخور والمسك تبقى على البشرة حتى الفجر.",
       "n.cardamom":"الهيل","n.iris":"السوسن","n.leather":"الجلد","n.oud":"العود","n.incense":"البخور","n.musk":"المسك",
-      "feat.unit":"/ خلاصة ١٠٠ مل","btn.cart":"أضف إلى السلة","stock.out":"نفد","feat.sample":"عيّنة · 9 ر.س",
+      "feat.unit":"/ خلاصة ١٠٠ مل","btn.cart":"أضف إلى السلة","stock.out":"نفد","offers.label":"أطقم CHATTLLE","offers.h2":"ثلاثيات بسعر <em>العرض</em>","cta.bundle":"اكتشف الطقم","bundle.add":"أضف الطقم إلى السلة","bundle.includes":"يشمل هذا الطقم","bundle.save":"توفّر","feat.sample":"عيّنة · 9 ر.س",
       "col.label":"مجموعة CHATTLLE","col.h2":"تسعة عطور، تسعُ <em>ساعاتٍ من الليل</em>","cta.discover":"اكتشف",
       "r1.type":"خشبي · مُدخّن","r1.name":"المخمل الأسود","r1.desc":"نجيلٌ مُدخّن وخشب الغاياك ولفافة من التبغ الأشقر.",
       "r2.type":"عنبري · شرقي","r2.name":"العنبر الداكن","r2.desc":"العنبر الرمادي واللبان والفانيليا السوداء مغلّفة بالراتنجات.",
@@ -1574,6 +1628,7 @@
     document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
     if(activeSlot)fill(activeSlot);else fill(slots[5]); // default panel content = signature
     if(typeof curProd!=='undefined'&&curProd)fillProduct(curProd);
+    if(typeof curBundle!=='undefined'&&curBundle){try{fillBundle(curBundle);}catch(e){}}
     if(window.renderCart)window.renderCart();
   }
   document.getElementById('langSwitch').addEventListener('click',(e)=>{const b=e.target.closest('.lang-btn');if(b)applyLang(b.dataset.lang);});
@@ -1665,13 +1720,32 @@
   function closeProduct(fromRoute){productPage.classList.remove('open');productPage.setAttribute('aria-hidden','true');
     document.body.classList.remove('pp-open');document.body.style.overflow='';curProd=null;
     if(!fromRoute){if(window.__ovDepth>0){window.__ovDepth--;try{history.back();}catch(e){}}else{try{history.replaceState({},'','/');}catch(e){}}}}
+  var bundlePage=document.getElementById('bundlePage'); var curBundle=null;
+  function bpPath(id){var b=window.__BUNDLES&&window.__BUNDLES[id];return '/offre/'+((b&&b.slug)||id);}
+  function fillBundle(id){var b=window.__BUNDLES&&window.__BUNDLES[id]; if(!b)return; var d=I18N[lang]||{}; var cur=(lang==='ar'?'ر.س':'SAR');
+    var nmEl=document.getElementById('bpName'); if(nmEl)nmEl.innerHTML=b.title[lang]||b.title.fr||'';
+    var dsEl=document.getElementById('bpDesc'); if(dsEl)dsEl.textContent=b.subtitle[lang]||b.subtitle.fr||'';
+    var stage=document.getElementById('bpStage'); if(stage)stage.innerHTML=b.rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
+    var orig=0,soldout=false; var listEl=document.getElementById('bpList');
+    var rowsHtml=b.rids.map(function(r){var nm=(d[r+'.name']||(window.__PNAME&&window.__PNAME[r])||'').replace(/<[^>]*>/g,'');var ty=(d[r+'.type']||'').replace(/<[^>]*>/g,'');var a=(window.__PAMT&&window.__PAMT[r]);if(a)orig+=Number(a);var sk=(window.__PSTOCK&&window.__PSTOCK[r]);if(sk!=null&&sk<=0)soldout=true;return '<div class="bp-item"><span><span class="bp-nm">'+nm+'</span><span class="bp-ty">'+ty+'</span></span><span class="bp-pr">'+(a?(a+' '+cur):'')+'</span></div>';}).join('');
+    if(listEl)listEl.innerHTML=rowsHtml;
+    var prEl=document.getElementById('bpPrice'); if(prEl)prEl.textContent=b.price+' '+cur;
+    var saveEl=document.getElementById('bpSave'); if(saveEl){var diff=orig-b.price;if(diff>0){saveEl.textContent=(d['bundle.save']||'You save')+' '+diff+' '+cur;saveEl.style.display='';}else{saveEl.style.display='none';}}
+    var add=document.getElementById('bpAdd'),so=document.getElementById('bpSold'); if(add){if(soldout)add.classList.add('pp-disabled');else add.classList.remove('pp-disabled');} if(so)so.hidden=!soldout; window.__bpSold=soldout;}
+  function openBundle(id,fromRoute){curBundle=id;fillBundle(id);if(bundlePage){bundlePage.classList.add('open');bundlePage.setAttribute('aria-hidden','false');}document.body.classList.add('pp-open');document.body.style.overflow='hidden';if(bundlePage)bundlePage.scrollTop=0;if(!fromRoute){try{history.pushState({ov:1},'',bpPath(id));}catch(e){}window.__ovDepth=(window.__ovDepth||0)+1;}}
+  function closeBundle(fromRoute){if(bundlePage){bundlePage.classList.remove('open');bundlePage.setAttribute('aria-hidden','true');}document.body.classList.remove('pp-open');document.body.style.overflow='';curBundle=null;if(!fromRoute){if(window.__ovDepth>0){window.__ovDepth--;try{history.back();}catch(e){}}else{try{history.replaceState({},'','/');}catch(e){}}}}
+  window.__openBundle=openBundle;window.__closeBundle=closeBundle;
+  (function(){var a=document.getElementById('bpAdd');if(a)a.addEventListener('click',function(e){e.preventDefault();if(window.__bpSold)return;if(!curBundle)return;var b=window.__BUNDLES&&window.__BUNDLES[curBundle];if(!b)return;CART.add('bundle:'+curBundle,'BUNDLE::'+curBundle,b.price,false,'');});var bk=document.getElementById('bpBack');if(bk)bk.addEventListener('click',function(e){e.preventDefault();closeBundle();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&bundlePage&&bundlePage.classList.contains('open'))closeBundle();});})();
   function ppParseRoute(){var p='/';try{p=decodeURIComponent(location.pathname||'/');}catch(e){p=location.pathname||'/';}var m;
     if((m=p.match(/^\/produit\/([^\/]+)\/?$/))){var sg=m[1];return {t:'product',key:(window.__BYSLUG&&window.__BYSLUG[sg])?window.__BYSLUG[sg]:sg};}
     if((m=p.match(/^\/page\/([^\/]+)\/?$/))){return {t:'page',key:m[1]};}
     if(p==='/journal'||p==='/journal/'){return {t:'journal'};}
     if((m=p.match(/^\/article\/([^\/]+)\/?$/))){return {t:'article',key:decodeURIComponent(m[1])};}
+    if((m=p.match(/^\/offre\/([^\/]+)\/?$/))){var bsl=m[1];return {t:'bundle',key:(window.__BYSLUGB&&window.__BYSLUGB[bsl])?window.__BYSLUGB[bsl]:bsl};}
     return {t:'home'};}
   function applyRoute(){var r=ppParseRoute();
+    if(typeof curBundle!=='undefined'&&curBundle&&r.t!=='bundle'&&window.__closeBundle)window.__closeBundle(true);
+    if(r.t==='bundle'&&r.key&&window.__openBundle){if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(window.__journalOpen&&window.__closeJournal)window.__closeJournal(true);if(window.__articleSlug&&window.__closeArticle)window.__closeArticle(true);if(curBundle!==r.key)window.__openBundle(r.key,true);return;}
     if(r.t==='product'&&r.key&&typeof PYR!=='undefined'&&PYR[lang]&&PYR[lang][r.key]){if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(curProd!==r.key)openProduct(r.key,true);return;}
     if(r.t==='page'&&r.key&&window.__openInfo){if(curProd)closeProduct(true);if(window.__infoKey!==r.key)window.__openInfo(r.key,true);return;}
     if(r.t==='journal'&&window.__openJournal){if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(window.__articleSlug&&window.__closeArticle)window.__closeArticle(true);if(!window.__journalOpen)window.__openJournal(true);return;}
@@ -1764,7 +1838,7 @@
     function remove(key){delete items[key];save();render();}
     function chg(key,d){if(!items[key])return;items[key].qty+=d;if(items[key].qty<=0)delete items[key];save();render();}
     function clear(){items={};save();render();}
-    function label(it){var d=I18N[lang]||{};var nm=(d[it.nameKey]||it.nameKey||'').replace(/<[^>]*>/g,'');if(it.sample)nm+=' \u2014 '+(d['cart.sample']||'Sample');return nm;}
+    function label(it){var d=I18N[lang]||{};if(it.nameKey&&it.nameKey.indexOf('BUNDLE::')===0){var bid=it.nameKey.slice(8);var bb=window.__BUNDLES&&window.__BUNDLES[bid];return bb?(bb.title[lang]||bb.title.fr||'Coffret'):'Coffret';}var nm=(d[it.nameKey]||it.nameKey||'').replace(/<[^>]*>/g,'');if(it.sample)nm+=' \u2014 '+(d['cart.sample']||'Sample');return nm;}
     function meta(it){var d=I18N[lang]||{};var t=it.typeKey?(d[it.typeKey]||''):'';return t.replace(/<[^>]*>/g,'');}
     function render(){
       if(countEl)countEl.textContent=count();
@@ -2072,6 +2146,46 @@
         el.textContent=JSON.stringify({"@context":"https://schema.org","@graph":graph});
       }).catch(function(){});}catch(e){}})();
     try{ const pg=await sb.from('pages').select('*'); if(pg&&pg.data&&window.__INFO){ pg.data.forEach(function(r){ window.__INFO[r.key]={fr:{t:r.title_fr||'',b:r.body_fr||''},en:{t:r.title_en||'',b:r.body_en||''},ar:{t:r.title_ar||'',b:r.body_ar||''}}; }); } }catch(e){}
+    // ---- bundles / offers ----
+    try{
+      var bRes=await sb.from('bundles').select('*').eq('active',true).order('sort_order',{ascending:true});
+      var bundles=(bRes.data||[]).filter(function(b){return Array.isArray(b.product_ids)&&b.product_ids.filter(Boolean).length>=3;});
+      var bgrid=document.getElementById('bundleGrid'), offers=document.getElementById('offers');
+      if(bundles.length&&bgrid){
+        var idByUuid={},PRODID=window.__PRODID||{};for(var kk in PRODID){idByUuid[String(PRODID[kk])]=kk;}
+        window.__BUNDLES=window.__BUNDLES||{};window.__BYSLUGB=window.__BYSLUGB||{};
+        bgrid.innerHTML='';
+        bundles.forEach(function(b){
+          var rids=b.product_ids.map(function(u){return idByUuid[String(u)];}).filter(Boolean).slice(0,3);
+          if(rids.length<3)return;
+          var slug=b.slug||b.id;
+          var price=(b.price_amount!=null?Number(b.price_amount):0);
+          window.__BUNDLES[b.id]={id:b.id,slug:slug,rids:rids,price:price,title:{fr:b.title_fr||'',en:b.title_en||'',ar:b.title_ar||''},subtitle:{fr:b.subtitle_fr||'',en:b.subtitle_en||'',ar:b.subtitle_ar||''}};
+          window.__BYSLUGB[slug]=b.id;
+          var orig=0,soldout=false;
+          rids.forEach(function(r){var a=(window.__PAMT&&window.__PAMT[r]);if(a)orig+=Number(a);var sk=(window.__PSTOCK&&window.__PSTOCK[r]);if(sk!=null&&sk<=0)soldout=true;});
+          var bn=(lang==='ar'?b.title_ar:(lang==='en'?b.title_en:b.title_fr))||b.title_fr||b.title_ar||'';
+          var bs=(lang==='ar'?b.subtitle_ar:(lang==='en'?b.subtitle_en:b.subtitle_fr))||'';
+          var cur=(lang==='ar'?'ر.س':'SAR');
+          var minis=rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
+          var priceHtml='<span class="ri-price">'+price+' '+cur+(orig>price?' <s>'+orig+' '+cur+'</s>':'')+'</span>';
+          var card=document.createElement('div');
+          card.className='col-card bundle-card reveal'+(soldout?' sold-out':'');
+          card.setAttribute('data-bundle',b.id);
+          card.innerHTML='<span class="cc-cnr tl"></span><span class="cc-cnr tr"></span><span class="cc-cnr bl"></span><span class="cc-cnr br"></span>'+
+            '<div class="bundle-stage">'+minis+'</div>'+
+            '<p class="ri-type">'+(lang==='ar'?'طقم · عرض':(lang==='en'?'Set · Offer':'Coffret · Offre'))+'</p>'+
+            '<h3 class="ri-name">'+bn+'</h3>'+
+            '<p class="ri-desc">'+bs+'</p>'+
+            '<div class="cc-foot">'+priceHtml+'<span class="ri-cta" data-i18n="cta.bundle">'+(lang==='ar'?'اكتشف الطقم':'Découvrir')+'</span></div>';
+          if(soldout){var so=document.createElement('span');so.className='cc-sold';so.setAttribute('data-i18n','stock.out');so.textContent=(lang==='ar'?'نفد':(lang==='en'?'Sold out':'Épuisé'));card.appendChild(so);}
+          card.addEventListener('click',function(e){e.preventDefault();if(window.__openBundle)window.__openBundle(b.id);});
+          bgrid.appendChild(card);
+          if(io)io.observe(card);else card.classList.add('in');
+        });
+        if(offers)offers.hidden=false;
+      }
+    }catch(e){}
     applyLang(typeof lang!=='undefined'?lang:'fr');try{if(window.applyRoute)window.applyRoute();}catch(e){}try{updateSeoTags(typeof lang!=='undefined'?lang:'fr');}catch(e){}
   }catch(e){ /* keep built-in defaults */ }
 })();
