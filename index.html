@@ -910,6 +910,12 @@
   .ar-body img{max-width:100%;border-radius:8px;margin:18px 0}
   .ar-foot{margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
   @media(max-width:760px){.jr-cov{height:150px}.jr-list{grid-template-columns:1fr 1fr;gap:12px}.jr-card-b{padding:13px}.jr-card-t{font-size:16px}.jr-card-x{font-size:12.5px;-webkit-line-clamp:2}.ar-body{font-size:16px}}
+  .pp-thumbs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .pp-thumb{width:62px;height:62px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(255,255,255,.03);cursor:pointer;padding:0;transition:border-color .3s,box-shadow .3s}
+  .pp-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .pp-thumb:hover{border-color:var(--gold-soft)}
+  .pp-thumb.active{border-color:var(--gold);box-shadow:0 0 10px rgba(199,162,74,.45)}
+  @media(max-width:860px){.pp-thumb{width:52px;height:52px}.pp-thumbs{margin-top:14px}}
 </style>
 <script type="application/ld+json">
 [
@@ -1239,6 +1245,7 @@
   <div class="pp-body">
     <div class="pp-visual">
       <div class="cc-stage pp-stage"><span class="cc-glow"></span><span class="cc-glass"></span><div class="cc-still"><img class="cc-bottle" alt=""><img class="cc-bottle-ref" alt="" aria-hidden="true"></div></div>
+      <div class="pp-thumbs" id="ppThumbs"></div>
     </div>
     <div class="pp-info"><span class="pp-cnr tl"></span><span class="pp-cnr tr"></span><span class="pp-cnr bl"></span><span class="pp-cnr br"></span>
       <div class="pp-kicker"><span class="pp-num" id="ppNum">N° I</span><span class="ri-type" id="ppType"></span></div>
@@ -1622,7 +1629,22 @@
   function fillProduct(id){const d=I18N[lang],py=PYR[lang][id];curProd=id;
     pp.num.textContent='N° '+RN[id];pp.type.textContent=d[id+'.type'];pp.name.innerHTML=d[id+'.name'];pp.desc.textContent=d[id+'.desc'];
     pp.story.textContent=PDESC[lang][id];
-    pp.top.textContent=py.t;pp.heart.textContent=py.h;pp.base.textContent=py.b;pp.price.textContent=PRICE[id];}
+    pp.top.textContent=py.t;pp.heart.textContent=py.h;pp.base.textContent=py.b;pp.price.textContent=PRICE[id];try{ppGallery(id);}catch(e){}}
+  function ppGallery(id){
+    var primary=(window.__PIMG&&window.__PIMG[id])||'';
+    var gal=(window.__PGAL&&window.__PGAL[id])||[];
+    var imgs=[]; if(primary)imgs.push(primary);
+    for(var i=0;i<gal.length;i++){if(gal[i]&&imgs.indexOf(gal[i])<0)imgs.push(gal[i]);}
+    var main=document.querySelectorAll('#productPage .cc-bottle,#productPage .cc-bottle-ref');
+    function setMain(u){main.forEach(function(im){im.src=u;});}
+    if(imgs.length)setMain(imgs[0]);
+    var tw=document.getElementById('ppThumbs'); if(!tw)return;
+    if(imgs.length<2){tw.innerHTML='';tw.style.display='none';return;}
+    tw.style.display=''; tw.innerHTML='';
+    imgs.forEach(function(u,idx){var b=document.createElement('button');b.type='button';b.className='pp-thumb'+(idx===0?' active':'');
+      var im=document.createElement('img');im.src=u;im.alt='';b.appendChild(im);
+      b.addEventListener('click',function(){setMain(u);var all=tw.querySelectorAll('.pp-thumb');for(var j=0;j<all.length;j++)all[j].classList.remove('active');b.classList.add('active');});
+      tw.appendChild(b);});}
   function ppSlug(id){return (window.__SLUG&&window.__SLUG[id])?window.__SLUG[id]:id;}
   function ppPathFor(id){return '/produit/'+ppSlug(id);}
   function openProduct(id,fromRoute){fillProduct(id);if(typeof rvOpen==='function')rvOpen(id);productPage.classList.add('open');productPage.setAttribute('aria-hidden','false');
@@ -1955,7 +1977,7 @@
       });
       if(typeof PRICE!=='undefined') PRICE[id]=ptxt;
       if(typeof RN!=='undefined') RN[id]=roman;
-      const url=p.image_url||DEF; imgMap[id]=url; pamt[id]=(p.price_amount!=null)?p.price_amount:''; window.__PRODID=window.__PRODID||{};window.__PNAME=window.__PNAME||{};window.__PIMG=window.__PIMG||{};window.__PAMT=window.__PAMT||{};window.__PRODID[id]=p.id;window.__PNAME[id]=p['name_ar']||p['name_en']||p['name_fr']||('CHATTLLE '+roman);window.__PIMG[id]=(p.image_url&&/^https?:/.test(p.image_url))?p.image_url:'';window.__PAMT[id]=(p.price_amount!=null)?Number(p.price_amount):null; (function(){var sg=(p.name_fr||p.name_en||p.name_ar||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');if(!sg)sg=id;window.__SLUG=window.__SLUG||{};window.__BYSLUG=window.__BYSLUG||{};window.__SLUG[id]=sg;window.__BYSLUG[sg]=id;})();
+      const url=p.image_url||DEF; imgMap[id]=url; pamt[id]=(p.price_amount!=null)?p.price_amount:''; window.__PRODID=window.__PRODID||{};window.__PNAME=window.__PNAME||{};window.__PIMG=window.__PIMG||{};window.__PAMT=window.__PAMT||{};window.__PRODID[id]=p.id;window.__PNAME[id]=p['name_ar']||p['name_en']||p['name_fr']||('CHATTLLE '+roman);window.__PIMG[id]=(p.image_url&&/^https?:/.test(p.image_url))?p.image_url:'';window.__PAMT[id]=(p.price_amount!=null)?Number(p.price_amount):null;window.__PGAL=window.__PGAL||{};window.__PGAL[id]=Array.isArray(p.gallery)?p.gallery.filter(function(u){return u&&/^https?:/.test(u);}):[]; (function(){var sg=(p.name_fr||p.name_en||p.name_ar||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');if(!sg)sg=id;window.__SLUG=window.__SLUG||{};window.__BYSLUG=window.__BYSLUG||{};window.__SLUG[id]=sg;window.__BYSLUG[sg]=id;})();
 
       const card=document.createElement('div');
       card.className='col-card reveal';
