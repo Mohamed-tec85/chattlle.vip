@@ -108,6 +108,7 @@
         <button class="tab" data-view="orders">الطلبات</button>
         <button class="tab" data-view="promos">أكواد الخصم</button>
         <button class="tab" data-view="reviews">التقييمات</button>
+        <button class="tab" data-view="indexnow">الفهرسة</button>
       </div>
       <div class="actions">
         <a href="index.html" target="_blank"><button>عرض الموقع ↗</button></a>
@@ -222,6 +223,24 @@
       <div class="hint">اعتمِد التقييمات الحقيقية لتظهر للعملاء وفي نتائج Google. كل تقييم جديد يصل بحالة «بانتظار المراجعة» — لا يُنشر إلا بموافقتك.</div>
       <div id="reviewsList"></div>
     </div>
+    <div id="view-indexnow" class="hidden">
+      <div class="dash-head">
+        <h2 style="margin:0;color:var(--gold-soft);font-size:18px">⚡ الفهرسة الفورية — IndexNow</h2>
+        <button id="idxBtn">🚀 إرسال كل الصفحات الآن</button>
+      </div>
+      <div id="idxStatus" style="margin:10px 0;min-height:20px;color:var(--gold-soft);font-size:14px"></div>
+      <div class="card">
+        <h3>💡 ما هو IndexNow؟</h3>
+        <p style="line-height:1.9;color:#cbb98c">بروتوكول مجاني يُبلغ <b>Bing</b> و<b>Yandex</b> فوراً بصفحات موقعك لتُفهرَس خلال دقائق بدل الانتظار أسابيع. وبما أنّ <b>بحث ChatGPT</b> يعتمد على Bing، فإنّ صفحاتك تصل إليه أيضاً.</p>
+        <ul style="line-height:2;color:#cbb98c;padding-inline-start:18px;margin:6px 0">
+          <li>✅ فهرسة في دقائق بدل أسابيع</li>
+          <li>✅ يرسل الصفحة الرئيسية وكل العطور وكل الصفحات تلقائياً</li>
+          <li>✅ يصل لبحث ChatGPT (يستخدم Bing)</li>
+          <li>✅ مجاني تماماً</li>
+        </ul>
+        <p style="line-height:1.9;color:#9a8a5e;font-size:13px">ملاحظة: IndexNow خاصّ بـ Bing / Yandex / ChatGPT ولا يؤثّر على <b>جوجل</b> — فهرسة جوجل تتمّ عبر Google Search Console.</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -235,6 +254,32 @@ const LANGS=[['fr','Français'],['en','English'],['ar','العربية']];
 const LFIELDS=[['name','الاسم','input'],['type','النوع','input'],['desc','الوصف القصير','textarea'],
                ['story','القصّة','textarea'],['top','النوتة العلوية','input'],['heart','نوتة القلب','input'],['base','النوتة القاعدية','input']];
 const $=s=>document.querySelector(s);
+/* ---- IndexNow instant indexing ---- */
+const IDX_KEY='3eb45a086416d2c8998cd39c1bd66981';
+const IDX_SITE='https://chattlle.vip';
+function idxSlug(s){return (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');}
+async function idxSubmit(){
+  const btn=$('#idxBtn'),st=$('#idxStatus'); if(!btn)return;
+  btn.disabled=true; st.textContent='جاري التجهيز…';
+  try{
+    const urls=[IDX_SITE+'/'];
+    const {data:prods}=await supabase.from('products').select('id,name_fr,name_en,name_ar,active').eq('active',true);
+    (prods||[]).forEach(p=>{let sg=idxSlug(p.name_fr||p.name_en||p.name_ar);if(!sg)sg=p.id;urls.push(IDX_SITE+'/produit/'+sg);});
+    const {data:pgs}=await supabase.from('pages').select('key');
+    (pgs||[]).forEach(p=>{if(p.key)urls.push(IDX_SITE+'/page/'+encodeURIComponent(p.key));});
+    const list=[...new Set(urls)];
+    st.textContent='جاري إرسال '+list.length+' صفحة…';
+    let sent=0;
+    for(const u of list){
+      const ep='https://api.indexnow.org/indexnow?url='+encodeURIComponent(u)+'&key='+IDX_KEY+'&keyLocation='+encodeURIComponent(IDX_SITE+'/'+IDX_KEY+'.txt');
+      try{await fetch(ep,{mode:'no-cors'});sent++;}catch(e){}
+      await new Promise(r=>setTimeout(r,200));
+    }
+    st.innerHTML='✅ تم إرسال <b>'+sent+'</b> صفحة إلى Bing وYandex (وبحث ChatGPT). قد تستغرق الفهرسة من دقائق إلى ساعات.';
+  }catch(e){st.textContent='تعذّر الإرسال: '+(e&&e.message?e.message:e);}
+  btn.disabled=false;
+}
+$('#idxBtn')&&$('#idxBtn').addEventListener('click',idxSubmit);
 const sar=n=>(Number(n)||0).toLocaleString('en-US',{maximumFractionDigits:2})+' ر.س';
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -266,6 +311,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   $('#view-orders').classList.toggle('hidden', v!=='orders');
   $('#view-promos').classList.toggle('hidden', v!=='promos');
   $('#view-reviews').classList.toggle('hidden', v!=='reviews');
+  $('#view-indexnow').classList.toggle('hidden', v!=='indexnow');
   if(v==='home') loadDashboard();
   if(v==='pages') loadPages();
   if(v==='orders') loadOrders();
