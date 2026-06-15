@@ -105,6 +105,7 @@
         <button class="tab active" data-view="home">الرئيسية</button>
         <button class="tab" data-view="products">المنتجات</button>
         <button class="tab" data-view="pages">الصفحات</button>
+        <button class="tab" data-view="articles">المجلّة</button>
         <button class="tab" data-view="orders">الطلبات</button>
         <button class="tab" data-view="promos">أكواد الخصم</button>
         <button class="tab" data-view="reviews">التقييمات</button>
@@ -169,6 +170,11 @@
     </div>
 
     <div id="view-pages" class="hidden"><div id="pagesList"></div></div>
+    <div id="view-articles" class="hidden">
+      <div class="toolbar"><h2>المجلّة (مقالات العطور)</h2><button class="btn-gold" id="addArticle">➕ مقال جديد</button></div>
+      <div class="hint">المقالات تظهر في الموقع على <code>/article/الرابط</code> وفي صفحة «المجلّة». لا يُنشر المقال إلا عند اختيار الحالة «منشور». اكتب رابطاً (slug) إنجليزياً قصيراً لكل مقال. يمكنك استخدام وسوم بسيطة في المحتوى مثل فقرات p أو عناوين h3 أو روابط a.</div>
+      <div id="articlesList"></div>
+    </div>
 
     <div id="view-orders" class="hidden">
       <div class="dash-head"><h2 style="margin:0;color:var(--gold-soft);font-size:18px">الطلبات</h2>
@@ -268,6 +274,7 @@ async function idxSubmit(){
     (prods||[]).forEach(p=>{let sg=idxSlug(p.name_fr||p.name_en||p.name_ar);if(!sg)sg=p.id;urls.push(IDX_SITE+'/produit/'+sg);});
     const {data:pgs}=await supabase.from('pages').select('key');
     (pgs||[]).forEach(p=>{if(p.key)urls.push(IDX_SITE+'/page/'+encodeURIComponent(p.key));});
+    try{const {data:arts}=await supabase.from('articles').select('slug').eq('status','published');if(arts&&arts.length){urls.push(IDX_SITE+'/journal');arts.forEach(a=>{if(a.slug)urls.push(IDX_SITE+'/article/'+encodeURIComponent(a.slug));});}}catch(e){}
     const list=[...new Set(urls)];
     st.textContent='جاري إرسال '+list.length+' صفحة…';
     let sent=0;
@@ -290,6 +297,7 @@ async function genSitemap(){
     (prods||[]).forEach(p=>{let sg=idxSlug(p.name_fr||p.name_en||p.name_ar);if(!sg)sg=p.id;u.push({loc:IDX_SITE+'/produit/'+sg,pr:'0.8',cf:'weekly',alt:true});});
     const {data:pgs}=await supabase.from('pages').select('key');
     (pgs||[]).forEach(p=>{if(p.key)u.push({loc:IDX_SITE+'/page/'+encodeURIComponent(p.key),pr:'0.5',cf:'monthly',alt:false});});
+    try{const {data:arts}=await supabase.from('articles').select('slug').eq('status','published');if(arts&&arts.length){u.push({loc:IDX_SITE+'/journal',pr:'0.6',cf:'weekly',alt:true});arts.forEach(a=>{if(a.slug)u.push({loc:IDX_SITE+'/article/'+encodeURIComponent(a.slug),pr:'0.7',cf:'monthly',alt:true});});}}catch(e){}
     let xml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
     u.forEach(x=>{xml+='  <url>\n    <loc>'+x.loc+'</loc>\n';
       if(x.alt){const j=x.loc.indexOf('?')>=0?'&':'?';xml+='    <xhtml:link rel="alternate" hreflang="x-default" href="'+x.loc+'"/>\n    <xhtml:link rel="alternate" hreflang="fr" href="'+x.loc+'"/>\n    <xhtml:link rel="alternate" hreflang="en" href="'+x.loc+j+'lang=en"/>\n    <xhtml:link rel="alternate" hreflang="ar" href="'+x.loc+j+'lang=ar"/>\n';}
@@ -328,6 +336,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   $('#view-home').classList.toggle('hidden', v!=='home');
   $('#view-products').classList.toggle('hidden', v!=='products');
   $('#view-pages').classList.toggle('hidden', v!=='pages');
+  $('#view-articles').classList.toggle('hidden', v!=='articles');
   $('#view-orders').classList.toggle('hidden', v!=='orders');
   $('#view-promos').classList.toggle('hidden', v!=='promos');
   $('#view-reviews').classList.toggle('hidden', v!=='reviews');
@@ -527,6 +536,82 @@ async function savePage(key,panel){
   if(error){ st.textContent='خطأ: '+error.message; st.style.color='#e79bab'; return; }
   st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
 }
+
+const ARLANGS=[['fr','Français'],['en','English'],['ar','العربية']];
+function arSlugify(v){return (v||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');}
+async function loadArticles(){
+  const wrap=$('#articlesList'); if(!wrap)return; wrap.innerHTML='<p style="color:var(--muted)">جاري التحميل...</p>';
+  const { data, error }=await supabase.from('articles').select('*').order('created_at',{ascending:false});
+  if(error){ wrap.innerHTML='<p class="msg err">خطأ: '+error.message+'</p>'; return; }
+  wrap.innerHTML=''; if(!data||!data.length){ wrap.innerHTML='<p style="color:var(--muted)">لا توجد مقالات بعد — اضغط «مقال جديد».</p>'; return; }
+  data.forEach(a=>wrap.appendChild(articlePanel(a)));
+}
+function articlePanel(a){
+  const d=document.createElement('details'); d.className='prod';
+  const cover=(a.cover_url||'').replace(/"/g,'&quot;');
+  const cols=ARLANGS.map(([c,label])=>`<div class="lang-col"><h4>${label}</h4>`+
+    `<label>العنوان</label><input type="text" data-af="title_${c}" value="${(a['title_'+c]||'').replace(/"/g,'&quot;')}">`+
+    `<label>مقتطف قصير</label><textarea data-af="excerpt_${c}" style="min-height:60px">${a['excerpt_'+c]||''}</textarea>`+
+    `<label>المحتوى</label><textarea data-af="body_${c}" style="min-height:160px">${a['body_'+c]||''}</textarea></div>`).join('');
+  const st=a.status==='published';
+  d.innerHTML=`<summary><div><div class="sum-name">${(a.title_ar||a.title_fr||a.slug||'(بدون عنوان)')} </div>
+      <div class="sum-sub">/article/${a.slug||''} ${st?'• منشور':'• مسودّة'}</div></div></summary>
+    <div class="body">
+      <div class="img-box">
+        <img src="${cover}" alt="" onerror="this.style.visibility='hidden'" data-preview>
+        <div><label>صورة الغلاف</label><input type="file" accept="image/*" data-coverfile>
+        <input type="hidden" data-af="cover_url" value="${cover}">
+        <div class="hint">تُرفع وتُحفظ فوراً.</div></div>
+      </div>
+      <div class="shared">
+        <div><label>الرابط (slug) — إنجليزي</label><input type="text" data-af="slug" value="${(a.slug||'').replace(/"/g,'&quot;')}" placeholder="best-night-perfumes"></div>
+        <div><label>الحالة</label><select data-af="status"><option value="draft" ${!st?'selected':''}>مسودّة</option><option value="published" ${st?'selected':''}>منشور</option></select></div>
+      </div>
+      <div class="lang-grid">${cols}</div>
+      <div class="save-row"><button class="btn-gold" data-saveart>حفظ المقال</button>
+        <button class="btn-danger" data-delart>حذف</button><span class="status" data-status></span></div>
+    </div>`;
+  d.querySelector('[data-coverfile]').addEventListener('change',e=>uploadCover(e.target.files[0],a.id,d));
+  d.querySelector('[data-saveart]').addEventListener('click',()=>saveArticle(a.id,d));
+  d.querySelector('[data-delart]').addEventListener('click',()=>delArticle(a.id,a.title_ar||a.title_fr||a.slug));
+  return d;
+}
+async function uploadCover(file,id,panel){
+  if(!file)return; const st=panel.querySelector('[data-status]'); st.textContent='جاري رفع الصورة...'; st.style.color='var(--muted)';
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase(); const path=`articles/${id}/${Date.now()}.${ext}`;
+  const up=await supabase.storage.from('perfumes').upload(path,file,{upsert:true,contentType:file.type});
+  if(up.error){ st.textContent='خطأ في الرفع: '+up.error.message; st.style.color='#e79bab'; return; }
+  const url=supabase.storage.from('perfumes').getPublicUrl(path).data.publicUrl;
+  panel.querySelector('[data-af="cover_url"]').value=url;
+  const prev=panel.querySelector('[data-preview]'); prev.src=url; prev.style.visibility='visible';
+  await supabase.from('articles').update({cover_url:url,updated_at:new Date().toISOString()}).eq('id',id);
+  st.textContent='✓ تم رفع الصورة'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
+}
+async function saveArticle(id,panel){
+  const st=panel.querySelector('[data-status]'); st.textContent='جاري الحفظ...'; st.style.color='var(--muted)';
+  const payload={updated_at:new Date().toISOString()};
+  panel.querySelectorAll('[data-af]').forEach(el=>{ payload[el.dataset.af]=el.value; });
+  payload.slug=arSlugify(payload.slug)|| (arSlugify(payload.title_fr||payload.title_en||payload.title_ar)||('article-'+Date.now()));
+  const { error }=await supabase.from('articles').update(payload).eq('id',id);
+  if(error){ st.textContent='خطأ: '+(error.message.indexOf('duplicate')>=0?'هذا الرابط مستخدم — غيّره':error.message); st.style.color='#e79bab'; return; }
+  st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)';
+  const nm=panel.querySelector('.sum-name'); if(nm) nm.textContent=(payload.title_ar||payload.title_fr||payload.slug||'')+' ';
+  const sub=panel.querySelector('.sum-sub'); if(sub) sub.textContent='/article/'+payload.slug+' '+(payload.status==='published'?'• منشور':'• مسودّة');
+  setTimeout(()=>st.textContent='',2500);
+}
+async function delArticle(id,name){
+  if(!confirm('حذف "'+(name||'هذا المقال')+'" نهائياً؟')) return;
+  const { error }=await supabase.from('articles').delete().eq('id',id);
+  if(error){ alert('خطأ: '+error.message); return; }
+  loadArticles();
+}
+$('#addArticle')&&$('#addArticle').addEventListener('click',async()=>{
+  const slug='article-'+Date.now();
+  const { error }=await supabase.from('articles').insert({slug:slug,status:'draft',title_ar:'مقال جديد',title_fr:'Nouvel article'});
+  if(error){ alert('خطأ: '+error.message); return; }
+  loadArticles();
+});
+document.querySelector('[data-view="articles"]')&&document.querySelector('[data-view="articles"]').addEventListener('click',loadArticles);
 
 const OSTATUS={placed:{l:'جديد',c:'#c7a24a'},shipped:{l:'تم الشحن',c:'#2da379'},completed:{l:'مكتمل',c:'#7fb3a0'},cancelled:{l:'ملغي',c:'#c0506a'}};
 function ostat(s){return OSTATUS[s]||{l:s||'—',c:'#8f9a8f'};}

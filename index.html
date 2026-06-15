@@ -883,6 +883,33 @@
   }
   .marquee-track>span:not(.mq-neon){unicode-bidi:plaintext}
   [dir=rtl] .marquee-track .mq-neon{direction:rtl}
+  /* journal + article */
+  .jr-wrap{max-width:1040px;margin:0 auto;padding:7vh 6vw 13vh}
+  .jr-wrap h2{font-family:var(--display);font-weight:300;font-size:clamp(28px,5vw,44px);color:var(--cream);margin:0 0 30px;text-align:center;letter-spacing:.02em}
+  [dir=rtl] .jr-wrap h2{font-family:var(--ar-display)}
+  .jr-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px}
+  .jr-card{display:flex;flex-direction:column;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;transition:border-color .3s,transform .3s}
+  .jr-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+  .jr-cov{display:block;width:100%;height:180px;background-size:cover;background-position:center;background-color:#11140f}
+  .jr-cov-ph{background:linear-gradient(135deg,#1a1d16,#0d0f0b)}
+  .jr-card-b{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px}
+  .jr-card-t{font-family:var(--display);font-size:20px;color:var(--cream);line-height:1.3}
+  [dir=rtl] .jr-card-t{font-family:var(--ar-display)}
+  .jr-card-x{color:var(--muted);font-size:14px;line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .jr-card-r{color:var(--gold-soft);font-size:13px;letter-spacing:.06em;margin-top:4px}
+  .ar-wrap{max-width:760px;margin:0 auto;padding:6vh 6vw 13vh}
+  .ar-cover{width:100%;max-height:420px;object-fit:cover;border-radius:12px;display:block;margin:0 0 26px}
+  .ar-date{color:var(--gold-soft);font-size:13px;letter-spacing:.08em;margin-bottom:12px}
+  .ar-title{font-family:var(--display);font-weight:300;font-size:clamp(30px,5vw,48px);color:var(--cream);line-height:1.15;margin:0 0 24px}
+  [dir=rtl] .ar-title{font-family:var(--ar-display);line-height:1.4}
+  .ar-body{color:var(--muted);font-size:17px;line-height:1.95}
+  .ar-body p{margin:0 0 20px}
+  .ar-body h3{font-family:var(--display);color:var(--cream);font-size:24px;margin:32px 0 14px;font-weight:400}
+  [dir=rtl] .ar-body h3{font-family:var(--ar-display)}
+  .ar-body a{color:var(--gold-soft)}
+  .ar-body img{max-width:100%;border-radius:8px;margin:18px 0}
+  .ar-foot{margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
+  @media(max-width:760px){.jr-cov{height:150px}.jr-list{grid-template-columns:1fr 1fr;gap:12px}.jr-card-b{padding:13px}.jr-card-t{font-size:16px}.jr-card-x{font-size:12.5px;-webkit-line-clamp:2}.ar-body{font-size:16px}}
 </style>
 <script type="application/ld+json">
 [
@@ -938,6 +965,7 @@
     <a href="#collection" data-i18n="nav.collection">Collection</a>
     <a href="#story" data-i18n="nav.maison">La Maison</a>
     <a href="#pyramid" data-i18n="nav.notes">Les Notes</a>
+    <a href="/journal" data-journal data-i18n="nav.journal">Journal</a>
   </nav>
   <div class="nav-right">
     <div class="lang-switch" id="langSwitch">
@@ -1146,7 +1174,7 @@
     <div class="foot-col"><h5 data-i18n="foot.c2">Parfums</h5>
       <a href="#" data-i18n="foot.c2a">Collection CHATTLLE</a><a href="#" data-i18n="foot.c2b">Éditions rares</a><a href="#" data-i18n="foot.c2c">Coffrets</a><a href="#" data-i18n="foot.c2d">Échantillons</a></div>
     <div class="foot-col"><h5 data-i18n="foot.c3">Service</h5>
-      <a href="#" data-i18n="foot.c3a">Contact</a><a href="#" data-i18n="foot.c3b">Livraison & retours</a><a href="#" data-i18n="foot.c3c">Conseil olfactif</a><a href="#" data-i18n="foot.c3d">Boutiques</a></div>
+      <a href="#" data-i18n="foot.c3a">Contact</a><a href="#" data-i18n="foot.c3b">Livraison & retours</a><a href="#" data-i18n="foot.c3c">Conseil olfactif</a><a href="#" data-i18n="foot.c3d">Boutiques</a><a href="/journal" data-journal data-i18n="nav.journal">Journal</a></div>
   </div>
   <div class="foot-bottom">
     <span data-i18n="foot.copy">© 2026 CHATTLLE — Paris</span>
@@ -1180,6 +1208,26 @@
     <button class="info-back" id="infoBack"><span id="infoBackTxt">Retour</span></button>
   </div>
   <div class="info-body"><h2 id="infoTitle"></h2><div id="infoContent"></div></div>
+</div>
+
+<!-- JOURNAL (blog listing) -->
+<div class="info-page jr-page" id="journalPage" aria-hidden="true">
+  <div class="info-top"><span class="info-brand">CHATTLLE</span>
+    <button class="info-back" id="jrBack"><span id="jrBackTxt">Retour</span></button></div>
+  <div class="jr-wrap"><h2 id="jrHeading">Journal</h2><div id="jrList" class="jr-list"></div></div>
+</div>
+
+<!-- ARTICLE -->
+<div class="info-page ar-page" id="articlePage" aria-hidden="true">
+  <div class="info-top"><span class="info-brand">CHATTLLE</span>
+    <button class="info-back" id="arBack"><span id="arBackTxt">Retour</span></button></div>
+  <article class="ar-wrap">
+    <img id="arCover" class="ar-cover" alt="">
+    <div class="ar-date" id="arDate"></div>
+    <h1 id="arTitle" class="ar-title"></h1>
+    <div id="arBody" class="ar-body"></div>
+    <div class="ar-foot"><button class="info-back" id="arToJournal"><span id="arToJournalTxt">Journal</span></button></div>
+  </article>
 </div>
 
 <!-- PRODUCT PAGE -->
@@ -1235,6 +1283,7 @@
     <a href="#collection" data-i18n="nav.collection">Collection</a>
     <a href="#story" data-i18n="nav.maison">La Maison</a>
     <a href="#pyramid" data-i18n="nav.notes">Les Notes</a>
+    <a href="/journal" data-journal data-i18n="nav.journal">Journal</a>
   </nav>
   <div class="mm-lang" id="mmLangSwitch">
     <button class="lang-btn" data-lang="fr">FR</button><span class="lsep">·</span>
@@ -1503,7 +1552,7 @@
     lang=l;const dict=I18N[l];
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[k]!=null)el.innerHTML=dict[k];});
     document.querySelectorAll('[data-i18n-ph]').forEach(function(ph){var k=ph.getAttribute('data-i18n-ph');if(dict[k]!=null)ph.placeholder=dict[k];});
-    document.documentElement.lang=l;document.documentElement.dir=(l==='ar')?'rtl':'ltr';try{updateSeoTags(l);}catch(e){}
+    document.documentElement.lang=l;document.documentElement.dir=(l==='ar')?'rtl':'ltr';try{updateSeoTags(l);}catch(e){}try{if(window.__journalOpen&&window.__openJournal)window.__openJournal(true);}catch(e){}try{if(window.__articleSlug&&window.__openArticle)window.__openArticle(window.__articleSlug,true);}catch(e){}
     document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
     if(activeSlot)fill(activeSlot);else fill(slots[5]); // default panel content = signature
     if(typeof curProd!=='undefined'&&curProd)fillProduct(curProd);
@@ -1585,16 +1634,20 @@
   function ppParseRoute(){var p='/';try{p=decodeURIComponent(location.pathname||'/');}catch(e){p=location.pathname||'/';}var m;
     if((m=p.match(/^\/produit\/([^\/]+)\/?$/))){var sg=m[1];return {t:'product',key:(window.__BYSLUG&&window.__BYSLUG[sg])?window.__BYSLUG[sg]:sg};}
     if((m=p.match(/^\/page\/([^\/]+)\/?$/))){return {t:'page',key:m[1]};}
+    if(p==='/journal'||p==='/journal/'){return {t:'journal'};}
+    if((m=p.match(/^\/article\/([^\/]+)\/?$/))){return {t:'article',key:decodeURIComponent(m[1])};}
     return {t:'home'};}
   function applyRoute(){var r=ppParseRoute();
     if(r.t==='product'&&r.key&&typeof PYR!=='undefined'&&PYR[lang]&&PYR[lang][r.key]){if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(curProd!==r.key)openProduct(r.key,true);return;}
     if(r.t==='page'&&r.key&&window.__openInfo){if(curProd)closeProduct(true);if(window.__infoKey!==r.key)window.__openInfo(r.key,true);return;}
-    if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);window.__ovDepth=0;}
+    if(r.t==='journal'&&window.__openJournal){if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(window.__articleSlug&&window.__closeArticle)window.__closeArticle(true);if(!window.__journalOpen)window.__openJournal(true);return;}
+    if(r.t==='article'&&r.key&&window.__openArticle){if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(window.__journalOpen&&window.__closeJournal)window.__closeJournal(true);if(window.__articleSlug!==r.key)window.__openArticle(r.key,true);return;}
+    if(curProd)closeProduct(true);if(window.__infoKey&&window.__closeInfo)window.__closeInfo(true);if(window.__journalOpen&&window.__closeJournal)window.__closeJournal(true);if(window.__articleSlug&&window.__closeArticle)window.__closeArticle(true);window.__ovDepth=0;}
   window.addEventListener('popstate',function(){applyRoute();try{updateSeoTags(lang);}catch(e){}});window.applyRoute=applyRoute;
   (function(){var T={
-    fr:{'mq.ship1':'Livraison gratuite dès','mq.shipCur':'SAR','mq.promo1':'50 SAR dès 300 SAR','mq.copy':'Copier le code'},
-    en:{'mq.ship1':'Free shipping over','mq.shipCur':'SAR','mq.promo1':'50 SAR off from 300 SAR','mq.copy':'Copy code'},
-    ar:{'mq.ship1':'شحن مجّاني من','mq.shipCur':'ريال','mq.promo1':'خصم ٥٠ ريال من ٣٠٠ ريال','mq.copy':'انسخ الكود'}
+    fr:{'mq.ship1':'Livraison gratuite dès','mq.shipCur':'SAR','mq.promo1':'50 SAR dès 300 SAR','mq.copy':'Copier le code','nav.journal':'Journal','jr.title':'Le Journal','jr.read':'Lire','jr.empty':'Bientôt des articles…'},
+    en:{'mq.ship1':'Free shipping over','mq.shipCur':'SAR','mq.promo1':'50 SAR off from 300 SAR','mq.copy':'Copy code','nav.journal':'Journal','jr.title':'The Journal','jr.read':'Read','jr.empty':'Articles coming soon…'},
+    ar:{'mq.ship1':'شحن مجّاني من','mq.shipCur':'ريال','mq.promo1':'خصم ٥٠ ريال من ٣٠٠ ريال','mq.copy':'انسخ الكود','nav.journal':'المجلّة','jr.title':'المجلّة','jr.read':'اقرأ','jr.empty':'مقالات قريباً…'}
   };['fr','en','ar'].forEach(function(l){if(I18N[l])for(var k in T[l])I18N[l][k]=T[l][k];});})();
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.mqCode');if(!b)return;var code=(b.textContent||'').trim();if(!code)return;
     var done=function(){var fb=b.parentElement&&b.parentElement.querySelector('.mqCopied');if(fb){fb.textContent=(lang==='ar'?'تم النسخ ✓':(lang==='en'?'Copied ✓':'Copié ✓'));setTimeout(function(){fb.textContent='';},2000);}};
@@ -1972,6 +2025,77 @@
     try{ const pg=await sb.from('pages').select('*'); if(pg&&pg.data&&window.__INFO){ pg.data.forEach(function(r){ window.__INFO[r.key]={fr:{t:r.title_fr||'',b:r.body_fr||''},en:{t:r.title_en||'',b:r.body_en||''},ar:{t:r.title_ar||'',b:r.body_ar||''}}; }); } }catch(e){}
     applyLang(typeof lang!=='undefined'?lang:'fr');try{if(window.applyRoute)window.applyRoute();}catch(e){}try{updateSeoTags(typeof lang!=='undefined'?lang:'fr');}catch(e){}
   }catch(e){ /* keep built-in defaults */ }
+})();
+</script>
+<script>
+(function(){
+  var DEFTITLE=document.title;
+  function L(){return (typeof lang!=='undefined')?lang:'fr';}
+  function tr(k){try{var d=(typeof I18N!=='undefined'&&I18N[L()])?I18N[L()]:{};return d[k]||k;}catch(e){return k;}}
+  var BACK={fr:'Retour',en:'Back',ar:'\u0627\u0644\u0639\u0648\u062f\u0629'};
+  function pick(a,base){var l=L();return a[base+'_'+l]||a[base+'_fr']||a[base+'_en']||a[base+'_ar']||'';}
+  function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function fmtDate(iso){try{return new Date(iso).toLocaleDateString(L()==='ar'?'ar':(L()==='en'?'en-US':'fr-FR'),{year:'numeric',month:'long',day:'numeric'});}catch(e){return '';}}
+  var jp=document.getElementById('journalPage'), ap=document.getElementById('articlePage');
+  var listCache=null;
+  async function loadList(){var sb=window.__sb; if(!sb)return []; if(listCache)return listCache;
+    try{var r=await sb.from('articles').select('*').eq('status','published').order('created_at',{ascending:false});listCache=r.data||[];}catch(e){listCache=[];} return listCache;}
+  function renderList(rows){var el=document.getElementById('jrList'); if(!el)return;
+    var h=document.getElementById('jrHeading'); if(h)h.textContent=tr('jr.title');
+    if(!rows||!rows.length){el.innerHTML='<p style="color:var(--muted);text-align:center">'+esc(tr('jr.empty'))+'</p>';return;}
+    var out='';
+    for(var i=0;i<rows.length;i++){var a=rows[i];var title=pick(a,'title'),ex=pick(a,'excerpt'),cov=a.cover_url||'';
+      var covHtml=cov?('<span class="jr-cov" style="background-image:url(&quot;'+cov.replace(/"/g,'%22')+'&quot;)"></span>'):'<span class="jr-cov jr-cov-ph"></span>';
+      out+='<a class="jr-card" href="/article/'+encodeURIComponent(a.slug)+'" data-aropen="'+encodeURIComponent(a.slug)+'">'+covHtml+'<span class="jr-card-b"><span class="jr-card-t">'+esc(title)+'</span><span class="jr-card-x">'+esc(ex)+'</span><span class="jr-card-r">'+esc(tr('jr.read'))+' \u2192</span></span></a>';}
+    el.innerHTML=out;}
+  function setBack(){var l=L();var a=document.getElementById('jrBackTxt');if(a)a.textContent=BACK[l]||BACK.fr;var b=document.getElementById('arBackTxt');if(b)b.textContent=BACK[l]||BACK.fr;var c=document.getElementById('arToJournalTxt');if(c)c.textContent=tr('jr.title');}
+  async function openJournal(fromRoute){var rows=await loadList(); renderList(rows); setBack();
+    jp.classList.add('open'); jp.setAttribute('aria-hidden','false');
+    document.body.classList.add('co-open'); document.body.style.overflow='hidden'; jp.scrollTop=0; window.__journalOpen=true;
+    if(!fromRoute){try{history.pushState({ov:1},'','/journal');}catch(e){}window.__ovDepth=(window.__ovDepth||0)+1;}
+    try{document.title=tr('jr.title')+' \u2014 CHATTLLE';}catch(e){}
+    try{updateSeoTags(L());}catch(e){}}
+  function closeJournal(fromRoute){jp.classList.remove('open'); jp.setAttribute('aria-hidden','true'); window.__journalOpen=false;
+    document.body.classList.remove('co-open'); if(!document.body.classList.contains('pp-open'))document.body.style.overflow='';
+    try{document.title=DEFTITLE;}catch(e){}
+    if(!fromRoute){if(window.__ovDepth>0){window.__ovDepth--;try{history.back();}catch(e){}}else{try{history.replaceState({},'','/');}catch(e){}try{updateSeoTags(L());}catch(e){}}}}
+  async function openArticle(slug,fromRoute){var sb=window.__sb; var a=null;
+    if(listCache){for(var i=0;i<listCache.length;i++){if(listCache[i].slug===slug){a=listCache[i];break;}}}
+    if(!a&&sb){try{var r=await sb.from('articles').select('*').eq('slug',slug).eq('status','published').limit(1);a=(r.data&&r.data[0])||null;}catch(e){}}
+    if(!a){if(!fromRoute){try{history.replaceState({},'','/journal');}catch(e){}}openJournal(true);return;}
+    var title=pick(a,'title'),body=pick(a,'body'),cov=a.cover_url||'';
+    var cEl=document.getElementById('arCover'); if(cEl){if(cov){cEl.src=cov;cEl.style.display='';}else{cEl.style.display='none';}}
+    var tEl=document.getElementById('arTitle'); if(tEl)tEl.textContent=title;
+    var dEl=document.getElementById('arDate'); if(dEl)dEl.textContent=fmtDate(a.created_at);
+    var bEl=document.getElementById('arBody'); if(bEl)bEl.innerHTML=body||'';
+    setBack();
+    ap.classList.add('open'); ap.setAttribute('aria-hidden','false');
+    document.body.classList.add('co-open'); document.body.style.overflow='hidden'; ap.scrollTop=0; window.__articleSlug=slug;
+    if(!fromRoute){try{history.pushState({ov:1},'','/article/'+encodeURIComponent(slug));}catch(e){}window.__ovDepth=(window.__ovDepth||0)+1;}
+    try{document.title=title+' \u2014 CHATTLLE';}catch(e){}
+    try{var md=document.querySelector('meta[name=description]');if(md){var ex=pick(a,'excerpt');if(ex)md.setAttribute('content',ex);}}catch(e){}
+    try{injectLD(a,title,cov);}catch(e){}
+    try{updateSeoTags(L());}catch(e){}}
+  function closeArticle(fromRoute){ap.classList.remove('open'); ap.setAttribute('aria-hidden','true'); window.__articleSlug=null;
+    document.body.classList.remove('co-open'); if(!document.body.classList.contains('pp-open'))document.body.style.overflow='';
+    try{document.title=DEFTITLE;}catch(e){}
+    try{var ld=document.getElementById('arLD');if(ld&&ld.parentNode)ld.parentNode.removeChild(ld);}catch(e){}
+    if(!fromRoute){if(window.__ovDepth>0){window.__ovDepth--;try{history.back();}catch(e){}}else{try{history.replaceState({},'','/');}catch(e){}try{updateSeoTags(L());}catch(e){}}}}
+  function injectLD(a,title,cov){var old=document.getElementById('arLD'); if(old&&old.parentNode)old.parentNode.removeChild(old);
+    var origin=(location&&location.origin)||'https://chattlle.vip';
+    var ld={"@context":"https://schema.org","@type":"Article","headline":title,"datePublished":a.created_at,"dateModified":a.updated_at||a.created_at,"author":{"@type":"Organization","name":"CHATTLLE"},"publisher":{"@type":"Organization","name":"CHATTLLE"},"mainEntityOfPage":origin+"/article/"+a.slug};
+    if(cov)ld.image=cov; var ex=pick(a,'excerpt'); if(ex)ld.description=ex;
+    var sc=document.createElement('script'); sc.type='application/ld+json'; sc.id='arLD'; sc.textContent=JSON.stringify(ld); document.head.appendChild(sc);}
+  window.__openArticle=openArticle; window.__closeArticle=closeArticle; window.__openJournal=openJournal; window.__closeJournal=closeJournal;
+  function bind(id,fn){var b=document.getElementById(id);if(b)b.addEventListener('click',fn);}
+  bind('jrBack',function(){closeJournal();});
+  bind('arBack',function(){closeArticle();});
+  bind('arToJournal',function(){ap.classList.remove('open');ap.setAttribute('aria-hidden','true');window.__articleSlug=null;openJournal();});
+  document.addEventListener('click',function(e){
+    var j=e.target.closest&&e.target.closest('[data-journal]'); if(j){e.preventDefault();openJournal();return;}
+    var c=e.target.closest&&e.target.closest('[data-aropen]'); if(c){e.preventDefault();var sg=decodeURIComponent(c.getAttribute('data-aropen'));openArticle(sg);return;}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(window.__articleSlug)closeArticle();else if(window.__journalOpen)closeJournal();}});
+  try{if(window.applyRoute)window.applyRoute();}catch(e){}
 })();
 </script>
 </body>
