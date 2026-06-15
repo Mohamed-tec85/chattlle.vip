@@ -919,6 +919,10 @@
   .co-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
   .co-err{color:#e79bab;font-size:14px;margin:8px 0 0;display:none}
   .co-input.err{border-color:#c0506a!important;box-shadow:0 0 0 1px rgba(192,80,106,.3)}
+  .cc-sold{position:absolute;top:14px;inset-inline-end:14px;z-index:6;background:rgba(0,0,0,.74);border:1px solid var(--gold-soft);color:var(--gold-soft);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:4px}
+  .col-card.sold-out .cc-bottle,.col-card.sold-out .cc-bottle-ref{opacity:.45;filter:grayscale(.35)}
+  .pp-sold{display:inline-block;margin-inline-start:12px;background:rgba(0,0,0,.5);border:1px solid var(--gold-soft);color:var(--gold-soft);font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:4px;vertical-align:middle}
+  .btn.pp-disabled{opacity:.4;pointer-events:none;filter:grayscale(.4)}
 </style>
 <script type="application/ld+json">
 [
@@ -1264,7 +1268,7 @@
         <div class="pp-tier"><span class="pp-tier-k" data-i18n="pp.heart">Note de c&oelig;ur</span><span class="pp-tier-v" id="ppHeart"></span></div>
         <div class="pp-tier"><span class="pp-tier-k" data-i18n="pp.base">Note de fond</span><span class="pp-tier-v" id="ppBase"></span></div>
       </div>
-      <div class="pp-buy"><span class="price pp-price" id="ppPrice"></span><small class="pp-unit" data-i18n="feat.unit">/ Extrait 100 ml</small></div>
+      <div class="pp-buy"><span class="price pp-price" id="ppPrice"></span><small class="pp-unit" data-i18n="feat.unit">/ Extrait 100 ml</small><span class="pp-sold" id="ppSold" data-i18n="stock.out" hidden>Épuisé</span></div>
       <div class="pp-actions">
         <a href="#" class="btn btn-fill" id="ppAdd" data-i18n="btn.cart">Ajouter au panier</a>
         
@@ -1402,7 +1406,7 @@
       "feat.label":"Le parfum signature","feat.name":"L'Heure Pourpre","feat.h2":"L'Heure <em>Pourpre</em>",
       "feat.p":"L'instant exact où le ciel bascule du rouge au noir. Une ouverture de cardamome et de poivre noir, un cœur d'iris et de cuir, puis un fond profond de oud, d'encens et de musc animal qui s'attarde sur la peau jusqu'à l'aube.",
       "n.cardamom":"Cardamome","n.iris":"Iris","n.leather":"Cuir","n.oud":"Oud","n.incense":"Encens","n.musk":"Musc",
-      "feat.unit":"/ Extrait 100 ml","btn.cart":"Ajouter au panier","feat.sample":"Échantillon · 9 ر.س",
+      "feat.unit":"/ Extrait 100 ml","btn.cart":"Ajouter au panier","stock.out":"Épuisé","feat.sample":"Échantillon · 9 ر.س",
       "col.label":"La Collection CHATTLLE","col.h2":"Neuf parfums, neuf <em>heures de la nuit</em>","cta.discover":"Découvrir",
       "r1.type":"Boisé · Fumé","r1.name":"Velours Noir","r1.desc":"Vétiver fumé, bois de gaïac et une volute de tabac blond.",
       "r2.type":"Ambré · Oriental","r2.name":"Ambre Sombre","r2.desc":"Ambre gris, benjoin et vanille noire enveloppés de résines.",
@@ -1435,7 +1439,7 @@
       "feat.label":"The signature scent","feat.name":"The Crimson Hour","feat.h2":"The <em>Crimson</em> Hour",
       "feat.p":"The exact moment the sky tips from red to black. An opening of cardamom and black pepper, a heart of iris and leather, then a deep base of oud, incense and animalic musk that lingers on the skin until dawn.",
       "n.cardamom":"Cardamom","n.iris":"Iris","n.leather":"Leather","n.oud":"Oud","n.incense":"Incense","n.musk":"Musk",
-      "feat.unit":"/ Extract 100 ml","btn.cart":"Add to cart","feat.sample":"Sample · 9 ر.س",
+      "feat.unit":"/ Extract 100 ml","btn.cart":"Add to cart","stock.out":"Sold out","feat.sample":"Sample · 9 ر.س",
       "col.label":"The CHATTLLE Collection","col.h2":"Nine perfumes, nine <em>hours of the night</em>","cta.discover":"Discover",
       "r1.type":"Woody · Smoky","r1.name":"Black Velvet","r1.desc":"Smoked vetiver, guaiac wood and a curl of blond tobacco.",
       "r2.type":"Amber · Oriental","r2.name":"Dark Amber","r2.desc":"Ambergris, benzoin and black vanilla wrapped in resins.",
@@ -1468,7 +1472,7 @@
       "feat.label":"العطر المميّز","feat.name":"ساعةُ الأرجوان","feat.h2":"ساعةُ <em>الأرجوان</em>",
       "feat.p":"اللحظة التي تتحوّل فيها السماء من الأحمر إلى الأسود. افتتاحيةٌ من الهيل والفلفل الأسود، وقلبٌ من السوسن والجلد، ثم قاعدةٌ عميقة من العود والبخور والمسك تبقى على البشرة حتى الفجر.",
       "n.cardamom":"الهيل","n.iris":"السوسن","n.leather":"الجلد","n.oud":"العود","n.incense":"البخور","n.musk":"المسك",
-      "feat.unit":"/ خلاصة ١٠٠ مل","btn.cart":"أضف إلى السلة","feat.sample":"عيّنة · 9 ر.س",
+      "feat.unit":"/ خلاصة ١٠٠ مل","btn.cart":"أضف إلى السلة","stock.out":"نفد","feat.sample":"عيّنة · 9 ر.س",
       "col.label":"مجموعة CHATTLLE","col.h2":"تسعة عطور، تسعُ <em>ساعاتٍ من الليل</em>","cta.discover":"اكتشف",
       "r1.type":"خشبي · مُدخّن","r1.name":"المخمل الأسود","r1.desc":"نجيلٌ مُدخّن وخشب الغاياك ولفافة من التبغ الأشقر.",
       "r2.type":"عنبري · شرقي","r2.name":"العنبر الداكن","r2.desc":"العنبر الرمادي واللبان والفانيليا السوداء مغلّفة بالراتنجات.",
@@ -1634,7 +1638,8 @@
   function fillProduct(id){const d=I18N[lang],py=PYR[lang][id];curProd=id;
     pp.num.textContent='N° '+RN[id];pp.type.textContent=d[id+'.type'];pp.name.innerHTML=d[id+'.name'];pp.desc.textContent=d[id+'.desc'];
     pp.story.textContent=PDESC[lang][id];
-    pp.top.textContent=py.t;pp.heart.textContent=py.h;pp.base.textContent=py.b;pp.price.textContent=PRICE[id];try{ppGallery(id);}catch(e){}}
+    pp.top.textContent=py.t;pp.heart.textContent=py.h;pp.base.textContent=py.b;pp.price.textContent=PRICE[id];try{ppGallery(id);}catch(e){}try{ppStock(id);}catch(e){}}
+  function ppStock(id){var sk=(window.__PSTOCK&&window.__PSTOCK[id]);var a=document.getElementById('ppAdd'),so=document.getElementById('ppSold');var out=(sk!=null&&sk<=0);if(a){if(out)a.classList.add('pp-disabled');else a.classList.remove('pp-disabled');}if(so)so.hidden=!out;}
   function ppGallery(id){
     var primary=(window.__PIMG&&window.__PIMG[id])||'';
     var gal=(window.__PGAL&&window.__PGAL[id])||[];
@@ -1747,8 +1752,10 @@
     function total(){return arr().reduce(function(s,it){return s+it.price*it.qty;},0);}
     function open(){overlay.classList.add('open');drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';}
     function close(){overlay.classList.remove('open');drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');if(!document.body.classList.contains('pp-open')&&!document.body.classList.contains('co-open'))document.body.style.overflow='';}
+    function _stockMsg(kind){var L=function(a,e,f){return lang==='ar'?a:(lang==='en'?e:f);};alert(kind==='out'?L('هذا العطر نفد من المخزون حالياً.','This fragrance is currently sold out.','Ce parfum est actuellement épuisé.'):L('لقد أضفت الكمية المتاحة كلّها.','You have added all available stock.','Vous avez ajouté tout le stock disponible.'));}
     function add(id,nameKey,price,sample,typeKey){
       var key=id+(sample?':sample':':full');
+      if(!sample){var sk=(window.__PSTOCK&&window.__PSTOCK[id]);if(sk!=null){if(sk<=0){_stockMsg('out');return;}var have=items[key]?items[key].qty:0;if(have>=sk){_stockMsg('max');return;}}}
       if(items[key])items[key].qty++;else items[key]={key:key,nameKey:nameKey,typeKey:typeKey||'',price:pnum(price),sample:!!sample,qty:1};
       try{if(window.gtag){var _d=I18N[lang]||{};gtag('event','add_to_cart',{currency:'SAR',value:pnum(price),items:[{item_name:(_d[nameKey]||nameKey||'').replace(/<[^>]*>/g,''),price:pnum(price),quantity:1}]});}}catch(e){}save();render();open();
     }
@@ -1994,7 +2001,7 @@
       });
       if(typeof PRICE!=='undefined') PRICE[id]=ptxt;
       if(typeof RN!=='undefined') RN[id]=roman;
-      const url=p.image_url||DEF; imgMap[id]=url; pamt[id]=(p.price_amount!=null)?p.price_amount:''; window.__PRODID=window.__PRODID||{};window.__PNAME=window.__PNAME||{};window.__PIMG=window.__PIMG||{};window.__PAMT=window.__PAMT||{};window.__PRODID[id]=p.id;window.__PNAME[id]=p['name_ar']||p['name_en']||p['name_fr']||('CHATTLLE '+roman);window.__PIMG[id]=(p.image_url&&/^https?:/.test(p.image_url))?p.image_url:'';window.__PAMT[id]=(p.price_amount!=null)?Number(p.price_amount):null;window.__PGAL=window.__PGAL||{};window.__PGAL[id]=Array.isArray(p.gallery)?p.gallery.filter(function(u){return u&&/^https?:/.test(u);}):[]; (function(){var sg=(p.name_fr||p.name_en||p.name_ar||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');if(!sg)sg=id;window.__SLUG=window.__SLUG||{};window.__BYSLUG=window.__BYSLUG||{};window.__SLUG[id]=sg;window.__BYSLUG[sg]=id;})();
+      const url=p.image_url||DEF; imgMap[id]=url; pamt[id]=(p.price_amount!=null)?p.price_amount:''; window.__PRODID=window.__PRODID||{};window.__PNAME=window.__PNAME||{};window.__PIMG=window.__PIMG||{};window.__PAMT=window.__PAMT||{};window.__PRODID[id]=p.id;window.__PNAME[id]=p['name_ar']||p['name_en']||p['name_fr']||('CHATTLLE '+roman);window.__PIMG[id]=(p.image_url&&/^https?:/.test(p.image_url))?p.image_url:'';window.__PAMT[id]=(p.price_amount!=null)?Number(p.price_amount):null;window.__PGAL=window.__PGAL||{};window.__PGAL[id]=Array.isArray(p.gallery)?p.gallery.filter(function(u){return u&&/^https?:/.test(u);}):[];window.__PSTOCK=window.__PSTOCK||{};window.__PSTOCK[id]=(p.stock==null||p.stock==='')?null:Number(p.stock); (function(){var sg=(p.name_fr||p.name_en||p.name_ar||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');if(!sg)sg=id;window.__SLUG=window.__SLUG||{};window.__BYSLUG=window.__BYSLUG||{};window.__SLUG[id]=sg;window.__BYSLUG[sg]=id;})();
 
       const card=document.createElement('div');
       card.className='col-card reveal';
@@ -2012,6 +2019,7 @@
         document.querySelectorAll('#productPage .cc-bottle,#productPage .cc-bottle-ref').forEach(function(im){im.src=url;});
       }
       card.querySelector('.ri-cta').addEventListener('click',open);
+      if(window.__PSTOCK&&window.__PSTOCK[id]!=null&&window.__PSTOCK[id]<=0){card.classList.add('sold-out');var _so=document.createElement('span');_so.className='cc-sold';_so.setAttribute('data-i18n','stock.out');_so.textContent=(lang==='ar'?'نفد':(lang==='en'?'Sold out':'Épuisé'));card.appendChild(_so);}
       grid.appendChild(card);
       if(io) io.observe(card); else card.classList.add('in');
     });

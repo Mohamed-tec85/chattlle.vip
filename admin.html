@@ -91,6 +91,10 @@
   .gal-item img{width:100%;height:100%;object-fit:cover}
   .gal-del{position:absolute;top:2px;right:2px;width:18px;height:18px;border:none;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:13px;line-height:1;padding:0}
   .gal-del:hover{background:#c0506a}
+  .btn-mini{display:inline-block;font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--cream);text-decoration:none;cursor:pointer;transition:all .2s}
+  .btn-mini:hover{border-color:var(--gold-soft);color:var(--gold-soft)}
+  .stock-alert{background:rgba(192,80,106,.08);border:1px solid rgba(202,164,90,.4);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:14px;line-height:1.7;color:var(--cream)}
+  .stock-alert b{color:var(--gold-soft)}
 </style>
 </head>
 <body>
@@ -435,7 +439,10 @@ async function loadProducts(){
   const list=$('#list'); list.innerHTML='<p style="color:var(--muted)">جاري التحميل...</p>';
   const { data, error }=await supabase.from('products').select('*').order('sort_order',{ascending:true});
   if(error){ list.innerHTML='<p class="msg err">خطأ: '+error.message+'</p>'; return; }
-  list.innerHTML=''; data.forEach(p=>list.appendChild(panelFor(p)));
+  const LOW=5; const out=data.filter(p=>p.stock!=null&&p.stock<=0), low=data.filter(p=>p.stock!=null&&p.stock>0&&p.stock<=LOW);
+  list.innerHTML='';
+  if(out.length||low.length){const al=document.createElement('div');al.className='stock-alert';al.innerHTML=(out.length?('<b>نفد ('+out.length+'):</b> '+out.map(p=>p.name_ar||p.name_fr||'—').join('، ')):'')+(out.length&&low.length?' — ':'')+(low.length?('<b>مخزون منخفض ('+low.length+'):</b> '+low.map(p=>(p.name_ar||p.name_fr||'—')+' ('+p.stock+')').join('، ')):'');list.appendChild(al);}
+  data.forEach(p=>list.appendChild(panelFor(p)));
 }
 function panelFor(p){
   const d=document.createElement('details'); d.className='prod';
@@ -444,11 +451,13 @@ function panelFor(p){
       return `<label>${fl}</label>`+(tag==='textarea'?`<textarea data-field="${fld}">${(p[fld]??'')}</textarea>`:`<input type="text" data-field="${fld}" value="${val}">`);}).join('')+`</div>`).join('');
   const img=p.image_url||'';
   const gal=Array.isArray(p.gallery)?p.gallery:[];
+  let stockBadge='';
+  if(p.stock!=null){ if(p.stock<=0) stockBadge=' <span class="badge-off" style="border-color:#c0506a;color:#e79bab">نفد</span>'; else if(p.stock<=5) stockBadge=' <span class="badge-off" style="border-color:#caa45a;color:#caa45a">منخفض ('+p.stock+')</span>'; }
   const galHtml=gal.map(u=>`<div class="gal-item"><img src="${u.replace(/"/g,'&quot;')}" alt=""><button type="button" class="gal-del" data-gurl="${u.replace(/"/g,'&quot;')}">\u00d7</button></div>`).join('');
   d.innerHTML=`
     <summary>
       <img class="thumb" src="${img}" alt="" onerror="this.style.visibility='hidden'">
-      <div><div class="sum-name">${p.name_ar||p.name_fr||'(بدون اسم)'} ${p.active?'':'<span class="badge-off">مخفي</span>'}</div>
+      <div><div class="sum-name">${p.name_ar||p.name_fr||'(بدون اسم)'} ${p.active?'':'<span class="badge-off">مخفي</span>'}${stockBadge}</div>
       <div class="sum-sub">${p.name_fr||''}</div></div>
       <div class="sum-no">N° ${p.sort_order??''}</div>
     </summary>
@@ -463,6 +472,7 @@ function panelFor(p){
       <div class="shared">
         <div><label>السعر (ر.س)</label><input type="number" step="0.01" data-field="price_amount" value="${p.price_amount??''}" placeholder="مثال: 340"></div>
         <div><label>الترتيب (الرقم)</label><input type="number" data-field="sort_order" value="${p.sort_order??0}"></div>
+        <div><label>المخزون (الكمية)</label><input type="number" min="0" data-field="stock" value="${p.stock??''}" placeholder="فارغ = غير محدود"></div>
         <div class="chk"><input type="checkbox" data-field="active" ${p.active?'checked':''}><span>ظاهر في الموقع</span></div>
       </div>
       <div class="lang-grid">${cols}</div>
@@ -664,6 +674,9 @@ async function loadOrders(){
 }
 function orderPanel(o,items){
   const d=document.createElement('details'); d.className='prod'; const st=ostat(o.status);
+  const waPhone=(o.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'966');
+  const waMsg=encodeURIComponent('مرحباً'+(o.customer_name?' '+o.customer_name:'')+'، بخصوص طلبك '+(o.ref||'')+' من CHATTLLE:');
+  const waHref=waPhone?('https://wa.me/'+waPhone+'?text='+waMsg):'';
   const rows=items.map(it=>`<tr><td>${it.product_name||'—'}</td><td>${it.qty}</td><td>${sar(it.unit_price)}</td><td>${sar(it.line_total)}</td></tr>`).join('')
     || '<tr><td colspan="4" style="color:var(--muted)">لا أصناف مسجّلة</td></tr>';
   d.innerHTML=`
@@ -678,6 +691,10 @@ function orderPanel(o,items){
         <div>الهاتف: <span style="color:var(--cream)">${o.phone||'—'}</span></div>
         <div>العنوان: <span style="color:var(--cream)">${o.address||'—'}</span></div>
         <div>الدفع: <span style="color:var(--cream)">${o.payment_method||'—'}</span></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <button type="button" class="btn-mini" data-copyaddr>نسخ بيانات الشحن</button>
+        ${waHref?`<a class="btn-mini" href="${waHref}" target="_blank" rel="noopener">مراسلة العميل (واتساب)</a>`:`<span class="btn-mini" style="opacity:.45;cursor:default">لا يوجد رقم للمراسلة</span>`}
       </div>
       <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table>
       <div style="display:flex;justify-content:flex-end;gap:24px;margin-top:12px;font-size:14px;flex-wrap:wrap">
@@ -698,6 +715,7 @@ function orderPanel(o,items){
       </div>
     </div>`;
   d.querySelector('[data-savestatus]').addEventListener('click',()=>changeStatus(o.id,d));
+  const ca=d.querySelector('[data-copyaddr]'); if(ca)ca.addEventListener('click',()=>{const t=[o.customer_name,o.phone,o.address].filter(Boolean).join('\n');navigator.clipboard.writeText(t).then(()=>{ca.textContent='✓ تم النسخ';setTimeout(()=>ca.textContent='نسخ بيانات الشحن',1500);}).catch(()=>{ca.textContent='تعذّر النسخ';});});
   return d;
 }
 async function changeStatus(id,panel){
