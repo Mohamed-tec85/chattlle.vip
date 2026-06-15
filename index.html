@@ -916,6 +916,9 @@
   .pp-thumb:hover{border-color:var(--gold-soft)}
   .pp-thumb.active{border-color:var(--gold);box-shadow:0 0 10px rgba(199,162,74,.45)}
   @media(max-width:860px){.pp-thumb{width:52px;height:52px}.pp-thumbs{margin-top:14px}}
+  .co-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
+  .co-err{color:#e79bab;font-size:14px;margin:8px 0 0;display:none}
+  .co-input.err{border-color:#c0506a!important;box-shadow:0 0 0 1px rgba(192,80,106,.3)}
 </style>
 <script type="application/ld+json">
 [
@@ -1328,6 +1331,7 @@
         <input class="co-input" id="coEmail" type="email" data-i18n-ph="co.email" placeholder="E-mail">
         <input class="co-input" id="coPhone" data-i18n-ph="co.phone" placeholder="T&eacute;l&eacute;phone">
         <input class="co-input" id="coAddr" data-i18n-ph="co.address" placeholder="Adresse">
+        <input class="co-hp" id="coCompany" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" placeholder="Company">
       </div>
       <div class="co-section">
         <span class="co-label" data-i18n="co.method">Mode de paiement</span>
@@ -1352,6 +1356,7 @@
           <input class="co-input" id="coStc" data-i18n-ph="co.stcphone" placeholder="STC Pay">
         </div>
       </div>
+      <p class="co-err" id="coErr" role="alert"></p>
       <button class="co-pay-btn" id="coPay"><span data-i18n="co.pay">Payer</span> <b id="coPayTotal"></b></button>
       <p class="co-secure" data-i18n="co.secure">Paiement 100% s&eacute;curis&eacute;</p>
     </div>
@@ -1856,10 +1861,22 @@
       page.querySelectorAll('.co-pay').forEach(function(p){var pm=p.dataset.pay;p.hidden=!((pm==='card'&&showCard)||(pm===method));});
     });});
     document.getElementById('coPay').addEventListener('click',function(){
+      var gv=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+      var hp=document.getElementById('coCompany'); if(hp&&hp.value.trim()){return;}
+      var L=function(a,e,f){return lang==='ar'?a:(lang==='en'?e:f);};
+      var ce=document.getElementById('coErr');
+      var pe=document.querySelectorAll('.co-input.err'); for(var _k=0;_k<pe.length;_k++)pe[_k].classList.remove('err');
+      if(ce){ce.textContent='';ce.style.display='none';}
+      function showErr(msg,fid){if(ce){ce.textContent=msg;ce.style.display='';}var f=document.getElementById(fid);if(f){f.classList.add('err');f.focus();}}
+      var nm=gv('coName'),em=gv('coEmail'),ph=gv('coPhone'),ad=gv('coAddr');
+      if(nm.length<2){showErr(L('أدخل الاسم الكامل.','Enter your full name.','Entrez votre nom complet.'),'coName');return;}
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){showErr(L('بريد إلكتروني غير صحيح.','Invalid email address.','Adresse e-mail invalide.'),'coEmail');return;}
+      if(ph.replace(/[^0-9]/g,'').length<9){showErr(L('رقم جوال غير صحيح.','Invalid phone number.','Numéro de téléphone invalide.'),'coPhone');return;}
+      if(ad.length<8){showErr(L('أدخل عنوان التوصيل كاملاً.','Enter your full delivery address.','Entrez votre adresse complète.'),'coAddr');return;}
       var ref='CHT-'+Math.random().toString(36).slice(2,8).toUpperCase();
       var d=I18N[lang]||{};
-      document.getElementById('coOrderRef').textContent=(d['co.ref']||'Order')+' '+ref;
-      try{var sb=window.__sb;if(sb){var its=CART.items();var sub=CART.total();var SH=window.__SHIP||{cost:0,freeOver:0};var ship=(SH.freeOver>0&&sub>=SH.freeOver)?0:(Number(SH.cost)||0);var dsc=pdisc(sub);var goods=sub-dsc;var tax=Math.round((goods+ship)*0.15*100)/100,tot=goods+ship+tax;var gv=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};sb.from('orders').insert({customer_name:gv('coName'),email:gv('coEmail'),phone:gv('coPhone'),address:gv('coAddr'),payment_method:method,subtotal:sub,discount:dsc,promo_code:(promo?promo.code:null),shipping:ship,tax:tax,total:tot,currency:'SAR',status:'placed'}).select().then(function(r){if(r&&r.data&&r.data[0]){var oid=r.data[0].id;var rows=its.map(function(it){return {order_id:oid,product_name:CART.label(it),unit_price:it.price,qty:it.qty,line_total:it.price*it.qty};});sb.from('order_items').insert(rows).then(function(){try{sb.functions.invoke('send-order-email',{body:{order_id:oid}});}catch(e){}});}});}}catch(e){}
+      document.getElementById('coOrderRef').textContent=L('رقم الطلب','Order','Commande')+' '+ref;
+      try{var sb=window.__sb;if(sb){var its=CART.items();var sub=CART.total();var SH=window.__SHIP||{cost:0,freeOver:0};var ship=(SH.freeOver>0&&sub>=SH.freeOver)?0:(Number(SH.cost)||0);var dsc=pdisc(sub);var goods=sub-dsc;var tax=Math.round((goods+ship)*0.15*100)/100,tot=goods+ship+tax;var gv=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};sb.from('orders').insert({ref:ref,customer_name:gv('coName'),email:gv('coEmail'),phone:gv('coPhone'),address:gv('coAddr'),payment_method:method,subtotal:sub,discount:dsc,promo_code:(promo?promo.code:null),shipping:ship,tax:tax,total:tot,currency:'SAR',status:'placed'}).select().then(function(r){if(r&&r.data&&r.data[0]){var oid=r.data[0].id;var rows=its.map(function(it){return {order_id:oid,product_name:CART.label(it),unit_price:it.price,qty:it.qty,line_total:it.price*it.qty};});sb.from('order_items').insert(rows).then(function(){try{sb.functions.invoke('send-order-email',{body:{order_id:oid}});}catch(e){}});}});}}catch(e){}
       try{if(window.gtag){var gi=CART.items().map(function(it){return {item_name:CART.label(it),price:it.price,quantity:it.qty};});var gs=CART.total();var GS=window.__SHIP||{cost:0,freeOver:0};var gsh=(GS.freeOver>0&&gs>=GS.freeOver)?0:(Number(GS.cost)||0);var gdc=pdisc(gs);var ggoods=gs-gdc;var gt=Math.round((ggoods+gsh)*0.15*100)/100;gtag('event','purchase',{transaction_id:ref,value:ggoods+gsh+gt,tax:gt,shipping:gsh,currency:'SAR',coupon:(promo?promo.code:undefined),items:gi});}}catch(e){}
       success.classList.add('show');CART.clear();promo=null;var _pc=document.getElementById('coPromoCode');if(_pc)_pc.value='';var _pm=document.getElementById('coPromoMsg');if(_pm){_pm.textContent='';_pm.className='co-promo-msg';}
     });

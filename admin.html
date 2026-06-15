@@ -669,7 +669,7 @@ function orderPanel(o,items){
   d.innerHTML=`
     <summary>
       <div><div class="sum-name">${o.customer_name||'بدون اسم'} <span class="obadge" style="border:1px solid ${st.c};color:${st.c};font-size:11px;border-radius:4px;padding:1px 8px;margin-inline-start:8px">${st.l}</span></div>
-      <div class="sum-sub">${odate(o.created_at)}</div></div>
+      <div class="sum-sub">${o.ref?o.ref+' · ':''}${odate(o.created_at)}</div></div>
       <div class="sum-no">${sar(o.total)}</div>
     </summary>
     <div class="body">
