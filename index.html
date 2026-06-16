@@ -2213,30 +2213,30 @@
       bc.querySelectorAll('a[data-open]').forEach(function(a){ a.setAttribute('data-open',pid); });
     }
     (function(){
-      var bestProds=active.filter(function(p){return p.bestseller;});
-      try{console.log('CHATTLLE build v2 — bestsellers count:', bestProds.length, bestProds.map(function(p){return p.id;}));}catch(e){}
       var tpl=document.querySelector('.best-card');
       var bestGrid=tpl?tpl.closest('.col-grid'):null;
       var bestSec=document.getElementById('feature');
-      if(bestGrid && tpl && bestProds.length){
-        if(bestSec) bestSec.style.display='';
-        var clean=tpl.cloneNode(true);
-        bestGrid.innerHTML='';
-        bestProds.forEach(function(p){
-          var bc=clean.cloneNode(true); bc.classList.add('reveal','in');
-          var t=bc.querySelector('.ri-type'); if(t)t.setAttribute('data-i18n',p.id+'.type');
-          var n=bc.querySelector('.ri-name'); if(n)n.setAttribute('data-i18n',p.id+'.name');
-          var ds=bc.querySelector('.ri-desc'); if(ds)ds.setAttribute('data-i18n',p.id+'.desc');
-          var num=bc.querySelector('.cc-num'); if(num&&typeof RN!=='undefined'&&RN[p.id])num.textContent='N°'+RN[p.id];
-          if(imgMap[p.id]) bc.querySelectorAll('.cc-bottle,.cc-bottle-ref').forEach(function(im){im.src=imgMap[p.id];});
-          var bp=bc.querySelector('.price'); if(bp&&typeof PRICE!=='undefined'&&PRICE[p.id]){var sm=bp.querySelector('small');bp.textContent=PRICE[p.id]+' ';if(sm)bp.appendChild(sm);}
-          bc.querySelectorAll('a[data-open]').forEach(function(a){a.setAttribute('data-open',p.id);a.addEventListener('click',function(e){e.preventDefault();if(typeof openProduct==='function')openProduct(p.id);});});
-          bestGrid.appendChild(bc);
-        });
-        if(typeof applyLang==='function') applyLang(document.documentElement.lang||'fr');
-      } else if(bestGrid && tpl){
-        if(bestSec) bestSec.style.display='none';
-      }
+      if(!tpl||!bestGrid){ return; }
+      var list=[];
+      active.forEach(function(p,i){ if(p.bestseller) list.push({rid:'r'+(i+1),roman:toRoman(i+1)}); });
+      try{console.log('CHATTLLE build v3 — bestsellers:', list.map(function(x){return x.rid;}));}catch(e){}
+      if(!list.length){ if(bestSec) bestSec.style.display='none'; return; }
+      if(bestSec) bestSec.style.display='';
+      var clean=tpl.cloneNode(true);
+      bestGrid.innerHTML='';
+      list.forEach(function(x){
+        var rid=x.rid;
+        var bc=clean.cloneNode(true); bc.classList.add('reveal','in');
+        var t=bc.querySelector('.ri-type'); if(t)t.setAttribute('data-i18n',rid+'.type');
+        var n=bc.querySelector('.ri-name'); if(n)n.setAttribute('data-i18n',rid+'.name');
+        var ds=bc.querySelector('.ri-desc'); if(ds)ds.setAttribute('data-i18n',rid+'.desc');
+        var num=bc.querySelector('.cc-num'); if(num)num.textContent='N°'+x.roman;
+        var url=imgMap[rid]; if(url) bc.querySelectorAll('.cc-bottle,.cc-bottle-ref').forEach(function(im){im.src=url;});
+        var bp=bc.querySelector('.price'); var ptx=(typeof PRICE!=='undefined'&&PRICE[rid])?PRICE[rid]:''; if(bp&&ptx){var sm=bp.querySelector('small');bp.textContent=ptx+' ';if(sm)bp.appendChild(sm);}
+        bc.querySelectorAll('a[data-open]').forEach(function(a){a.setAttribute('data-open',rid);a.addEventListener('click',function(e){e.preventDefault();if(typeof openProduct==='function')openProduct(rid);if(url)document.querySelectorAll('#productPage .cc-bottle,#productPage .cc-bottle-ref').forEach(function(im){im.src=url;});});});
+        bestGrid.appendChild(bc);
+      });
+      if(typeof applyLang==='function') applyLang(document.documentElement.lang||'fr');
     })();
 
     try{ const ss=await sb.from('settings').select('*'); if(ss&&ss.data){ const SM={}; ss.data.forEach(function(r){SM[r.key]=r;}); if(SM['col_h2']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['col_h2']['value_'+l]) I18N[l]['col.h2']=SM['col_h2']['value_'+l]; }); } if(SM['offers_label']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['offers_label']['value_'+l]) I18N[l]['offers.label']=SM['offers_label']['value_'+l]; }); } if(SM['offers_h2']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['offers_h2']['value_'+l]) I18N[l]['offers.h2']=SM['offers_h2']['value_'+l]; }); } if(SM['shipping']){ window.__SHIP={cost:Number(SM['shipping'].value_fr)||0, freeOver:Number(SM['shipping'].value_en)||0}; } if(SM['promo_banner']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['promo_banner']['value_'+l]) I18N[l]['pbanner.text']=SM['promo_banner']['value_'+l]; }); } var _pbc=SM['promo_banner_cfg']; var _pse=document.getElementById('promoSpray'),_psp=document.getElementById('promoSprayPill'); if(_pse){ _pse.style.display=(!_pbc||_pbc.value_en!=='0')?'':'none'; } if(_psp&&_pbc){ if(_pbc.value_fr){_psp.textContent=_pbc.value_fr;_psp.style.display='';}else{_psp.style.display='none';} } try{var _code=(_pbc&&_pbc.value_fr)?_pbc.value_fr:'WELCOME';document.querySelectorAll('.mqCode').forEach(function(e){e.textContent=_code;});var _fo=(window.__SHIP&&window.__SHIP.freeOver)?window.__SHIP.freeOver:500;document.querySelectorAll('.mqShipAmt').forEach(function(e){e.textContent=_fo;});}catch(_e){} } }catch(e){}
