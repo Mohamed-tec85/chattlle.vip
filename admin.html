@@ -121,6 +121,7 @@
         <button class="tab" data-view="reviews">التقييمات</button>
         <button class="tab" data-view="bundles">العروض</button>
         <button class="tab" data-view="indexnow">الفهرسة</button>
+        <button class="tab" data-view="subscribers">المشتركون</button>
       </div>
       <div class="actions">
         <a href="index.html" target="_blank"><button>عرض الموقع ↗</button></a>
@@ -265,6 +266,25 @@
         <p style="line-height:1.9;color:#9a8a5e;font-size:13px">ملاحظة: IndexNow خاصّ بـ Bing / Yandex / ChatGPT ولا يؤثّر على <b>جوجل</b> — فهرسة جوجل تتمّ عبر Google Search Console.</p>
       </div>
     </div>
+
+    <div id="view-subscribers" class="hidden">
+      <div class="dash-head">
+        <h2 style="margin:0;color:var(--gold-soft);font-size:18px">✉️ مشتركو الدائرة الخاصة</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span id="subCount" style="color:#cbb98c;font-size:14px"></span>
+          <button id="subRefresh">تحديث</button>
+          <button id="subExport">⬇️ تصدير CSV</button>
+        </div>
+      </div>
+      <div id="subStatus" style="margin:10px 0;min-height:20px;color:var(--gold-soft);font-size:14px"></div>
+      <div class="card">
+        <table>
+          <thead><tr><th>#</th><th>البريد الإلكتروني</th><th>اللغة</th><th>المصدر</th><th>تاريخ الاشتراك</th><th></th></tr></thead>
+          <tbody id="subBody"></tbody>
+        </table>
+        <div class="empty hidden" id="subEmpty">لا يوجد مشتركون بعد — ستظهر العناوين هنا تلقائياً عند أول اشتراك من الموقع.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -359,11 +379,13 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   $('#view-reviews').classList.toggle('hidden', v!=='reviews');
   $('#view-bundles').classList.toggle('hidden', v!=='bundles');
   $('#view-indexnow').classList.toggle('hidden', v!=='indexnow');
+  $('#view-subscribers').classList.toggle('hidden', v!=='subscribers');
   if(v==='home') loadDashboard();
   if(v==='pages') loadPages();
   if(v==='orders') loadOrders();
   if(v==='promos'){ loadPromos(); loadPromoBanner(); }
   if(v==='reviews') loadReviews();
+  if(v==='subscribers') loadSubscribers();
 }));
 
 let chartProd=null, chartTime=null;
@@ -893,6 +915,47 @@ $('#pbSave')&&$('#pbSave').addEventListener('click',async()=>{
   const r2=await supabase.from('settings').upsert(c,{onConflict:'key'});
   if((r1&&r1.error)||(r2&&r2.error)){ st.textContent='تعذّر الحفظ'; st.style.color='#e79bab'; return; }
   st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
+});
+
+/* ===== Subscribers (Le Cercle privé) ===== */
+let subsCache=[];
+async function loadSubscribers(){
+  const body=$('#subBody'), empty=$('#subEmpty'), st=$('#subStatus'), cnt=$('#subCount');
+  if(!body) return;
+  st.textContent='جاري التحميل…'; st.style.color='var(--gold-soft)'; body.innerHTML=''; empty.classList.add('hidden');
+  const { data, error }=await supabase.from('subscribers').select('*').order('created_at',{ascending:false});
+  if(error){ st.textContent='تعذّر التحميل: '+error.message; st.style.color='#e79bab'; return; }
+  st.textContent=''; subsCache=data||[];
+  cnt.textContent='('+subsCache.length+' مشترك)';
+  if(!subsCache.length){ empty.classList.remove('hidden'); return; }
+  const LMAP={ar:'العربية',en:'English',fr:'Français'};
+  body.innerHTML=subsCache.map(function(s,i){
+    const dt=s.created_at?new Date(s.created_at).toLocaleDateString('en-GB'):'—';
+    const lg=LMAP[s.lang]||s.lang||'—';
+    const em=(s.email||'').replace(/</g,'&lt;');
+    const src=(s.source||'—').replace(/</g,'&lt;');
+    return '<tr><td>'+(i+1)+'</td><td>'+em+'</td><td>'+lg+'</td><td>'+src+'</td><td>'+dt+'</td>'+
+           '<td><button class="sub-del" data-id="'+s.id+'" style="background:transparent;border:1px solid #c0506a;color:#e79bab;padding:4px 10px;border-radius:4px;cursor:pointer">حذف</button></td></tr>';
+  }).join('');
+  body.querySelectorAll('.sub-del').forEach(function(b){
+    b.addEventListener('click',async function(){
+      if(!confirm('حذف هذا المشترك؟')) return;
+      const { error }=await supabase.from('subscribers').delete().eq('id', b.dataset.id);
+      if(error){ alert('تعذّر الحذف: '+error.message); return; }
+      loadSubscribers();
+    });
+  });
+}
+$('#subRefresh')&&$('#subRefresh').addEventListener('click', loadSubscribers);
+$('#subExport')&&$('#subExport').addEventListener('click', function(){
+  if(!subsCache.length){ alert('لا يوجد مشتركون للتصدير.'); return; }
+  const rows=[['email','lang','source','status','created_at']];
+  subsCache.forEach(function(s){ rows.push([s.email||'', s.lang||'', s.source||'', s.status||'', s.created_at||'']); });
+  const csv='\uFEFF'+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='chattlle-subscribers-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 });
 
 init();
