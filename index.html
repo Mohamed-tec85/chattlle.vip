@@ -1343,6 +1343,18 @@
       </div>
     </div>
   </div>
+  <div class="pp-reviews" id="bpReviews">
+    <div class="rv-head"><h3 class="rv-title" data-i18n="rv.title">Avis clients</h3><div class="rv-sum" id="bpRvSum"></div></div>
+    <div class="rv-list" id="bpRvList"></div>
+    <button class="rv-toggle" id="bpRvToggle" type="button" data-i18n="rv.write">&Eacute;crire un avis</button>
+    <form class="rv-form" id="bpRvForm" hidden>
+      <div class="rv-stars-input" id="bpRvStars" role="radiogroup" aria-label="rating"><span data-v="1">&#9733;</span><span data-v="2">&#9733;</span><span data-v="3">&#9733;</span><span data-v="4">&#9733;</span><span data-v="5">&#9733;</span></div>
+      <input type="text" id="bpRvName" class="rv-inp" maxlength="60" data-i18n-ph="rv.name" placeholder="Votre nom">
+      <textarea id="bpRvBody" class="rv-inp" rows="3" maxlength="600" data-i18n-ph="rv.body" placeholder="Votre avis"></textarea>
+      <button type="submit" class="btn btn-fill rv-submit" data-i18n="rv.submit">Publier</button>
+      <p class="rv-msg" id="bpRvMsg"></p>
+    </form>
+  </div>
 </div>
 
 <!-- MOBILE MENU -->
@@ -1629,6 +1641,7 @@
     if(activeSlot)fill(activeSlot);else fill(slots[5]); // default panel content = signature
     if(typeof curProd!=='undefined'&&curProd)fillProduct(curProd);
     if(typeof curBundle!=='undefined'&&curBundle){try{fillBundle(curBundle);}catch(e){}}
+    try{if(window.__renderBundleCards)window.__renderBundleCards();}catch(e){}
     if(window.renderCart)window.renderCart();
   }
   document.getElementById('langSwitch').addEventListener('click',(e)=>{const b=e.target.closest('.lang-btn');if(b)applyLang(b.dataset.lang);});
@@ -1732,7 +1745,7 @@
     var prEl=document.getElementById('bpPrice'); if(prEl)prEl.textContent=b.price+' '+cur;
     var saveEl=document.getElementById('bpSave'); if(saveEl){var diff=orig-b.price;if(diff>0){saveEl.textContent=(d['bundle.save']||'You save')+' '+diff+' '+cur;saveEl.style.display='';}else{saveEl.style.display='none';}}
     var add=document.getElementById('bpAdd'),so=document.getElementById('bpSold'); if(add){if(soldout)add.classList.add('pp-disabled');else add.classList.remove('pp-disabled');} if(so)so.hidden=!soldout; window.__bpSold=soldout;}
-  function openBundle(id,fromRoute){curBundle=id;fillBundle(id);if(bundlePage){bundlePage.classList.add('open');bundlePage.setAttribute('aria-hidden','false');}document.body.classList.add('pp-open');document.body.style.overflow='hidden';if(bundlePage)bundlePage.scrollTop=0;if(!fromRoute){try{history.pushState({ov:1},'',bpPath(id));}catch(e){}window.__ovDepth=(window.__ovDepth||0)+1;}}
+  function openBundle(id,fromRoute){curBundle=id;fillBundle(id);try{bpRvOpen();}catch(e){}if(bundlePage){bundlePage.classList.add('open');bundlePage.setAttribute('aria-hidden','false');}document.body.classList.add('pp-open');document.body.style.overflow='hidden';if(bundlePage)bundlePage.scrollTop=0;if(!fromRoute){try{history.pushState({ov:1},'',bpPath(id));}catch(e){}window.__ovDepth=(window.__ovDepth||0)+1;}}
   function closeBundle(fromRoute){if(bundlePage){bundlePage.classList.remove('open');bundlePage.setAttribute('aria-hidden','true');}document.body.classList.remove('pp-open');document.body.style.overflow='';curBundle=null;if(!fromRoute){if(window.__ovDepth>0){window.__ovDepth--;try{history.back();}catch(e){}}else{try{history.replaceState({},'','/');}catch(e){}}}}
   window.__openBundle=openBundle;window.__closeBundle=closeBundle;
   (function(){var a=document.getElementById('bpAdd');if(a)a.addEventListener('click',function(e){e.preventDefault();if(window.__bpSold)return;if(!curBundle)return;var b=window.__BUNDLES&&window.__BUNDLES[curBundle];if(!b)return;CART.add('bundle:'+curBundle,'BUNDLE::'+curBundle,b.price,false,'');});var bk=document.getElementById('bpBack');if(bk)bk.addEventListener('click',function(e){e.preventDefault();closeBundle();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&bundlePage&&bundlePage.classList.contains('open'))closeBundle();});})();
@@ -1797,6 +1810,36 @@
     var tog=document.getElementById('rvToggle'),f=document.getElementById('rvForm');if(tog&&f)tog.addEventListener('click',function(){f.hidden=!f.hidden;if(!f.hidden){var n=document.getElementById('rvName');if(n)n.focus();}});
     if(f)f.addEventListener('submit',function(e){e.preventDefault();rvSubmit();});})();
   productPage.querySelectorAll('.pp-actions .btn').forEach(b=>b.addEventListener('click',e=>e.preventDefault()));
+  var bpRvRating=0;
+  function bpRvPaint(){var box=document.getElementById('bpRvStars');if(!box)return;box.querySelectorAll('span').forEach(function(s){s.classList.toggle('on',(+s.dataset.v)<=bpRvRating);});}
+  function bpRvOpen(){bpRvRating=0;var f=document.getElementById('bpRvForm');if(f)f.hidden=true;var m=document.getElementById('bpRvMsg');if(m){m.textContent='';m.className='rv-msg';}var n=document.getElementById('bpRvName'),b=document.getElementById('bpRvBody');if(n)n.value='';if(b)b.value='';bpRvPaint();bpRvLoad();}
+  function bpRvLoad(){var list=document.getElementById('bpRvList'),sum=document.getElementById('bpRvSum');if(!list||!sum)return;
+    var ref=curBundle?('bundle:'+curBundle):'';var sb=window.__sb;
+    list.innerHTML='<p class="rv-empty">'+rvL('\u062c\u0627\u0631\u064d \u0627\u0644\u062a\u062d\u0645\u064a\u0644\u2026','Loading\u2026','Chargement\u2026')+'</p>';sum.innerHTML='';
+    if(!ref||!sb){list.innerHTML='<p class="rv-empty">'+rvL('\u0644\u0627 \u062a\u0648\u062c\u062f \u062a\u0642\u064a\u064a\u0645\u0627\u062a \u0628\u0639\u062f','No reviews yet','Aucun avis')+'</p>';return;}
+    sb.from('reviews').select('author,rating,body,created_at').eq('product_ref',ref).eq('status','approved').order('created_at',{ascending:false}).then(function(r){
+      var rows=(r&&r.data)||[];
+      if(!rows.length){sum.innerHTML='';list.innerHTML='<p class="rv-empty">'+rvL('\u0643\u0646 \u0623\u0648\u0651\u0644 \u0645\u0646 \u064a\u0642\u064a\u0651\u0645 \u0647\u0630\u0627 \u0627\u0644\u0637\u0642\u0645','Be the first to review this set','Soyez le premier \u00e0 donner un avis')+'</p>';return;}
+      var sv=0;rows.forEach(function(x){sv+=x.rating;});var avg=sv/rows.length;
+      sum.innerHTML='<span class="rv-avg-stars">'+rvStarsHTML(Math.round(avg))+'</span><span class="rv-avg-num">'+avg.toFixed(1)+'</span><span class="rv-count">('+rows.length+')</span>';
+      list.innerHTML=rows.map(function(x){var d=x.created_at?new Date(x.created_at):null;var ds='';try{ds=d?d.toLocaleDateString(lang==='ar'?'ar':(lang==='en'?'en-US':'fr-FR'),{year:'numeric',month:'short',day:'numeric'}):'';}catch(e){ds='';}
+        return '<div class="rv-item"><div class="rv-item-top"><span class="rv-item-stars">'+rvStarsHTML(x.rating)+'</span><span class="rv-item-name">'+rvEsc(x.author)+'</span><span class="rv-item-date">'+ds+'</span></div>'+(x.body?'<p class="rv-item-body">'+rvEsc(x.body)+'</p>':'')+'</div>';}).join('');
+    }).catch(function(){list.innerHTML='<p class="rv-empty">'+rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u062a\u062d\u0645\u064a\u0644','Could not load reviews','Erreur de chargement')+'</p>';});}
+  function bpRvSubmit(){var msg=document.getElementById('bpRvMsg');var set=function(t,c){if(msg){msg.textContent=t;msg.className='rv-msg '+(c||'');}};
+    var nm=((document.getElementById('bpRvName')||{}).value||'').trim(),bd=((document.getElementById('bpRvBody')||{}).value||'').trim();
+    if(!bpRvRating){set(rvL('\u0627\u062e\u062a\u0631 \u062a\u0642\u064a\u064a\u0645\u0627\u064b \u0628\u0627\u0644\u0646\u062c\u0648\u0645','Please pick a star rating','Choisissez une note'),'err');return;}
+    if(!nm){set(rvL('\u0623\u062f\u062e\u0644 \u0627\u0633\u0645\u0643','Enter your name','Entrez votre nom'),'err');return;}
+    var ref=curBundle?('bundle:'+curBundle):'';var bb=window.__BUNDLES&&window.__BUNDLES[curBundle];var pname=bb?(bb.title[lang]||bb.title.fr||'Coffret'):'Coffret';var sb=window.__sb;
+    if(!ref||!sb){set(rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644','Could not submit','Erreur'),'err');return;}
+    set(rvL('\u062c\u0627\u0631\u064d \u0627\u0644\u0625\u0631\u0633\u0627\u0644\u2026','Sending\u2026','Envoi\u2026'),'');
+    sb.from('reviews').insert({product_ref:ref,product_name:pname,author:nm,rating:bpRvRating,body:bd,status:'pending'}).then(function(r){
+      if(r&&r.error){set(rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644','Could not submit','Erreur'),'err');return;}
+      set(rvL('\u0634\u0643\u0631\u0627\u064b! \u0633\u064a\u0638\u0647\u0631 \u062a\u0642\u064a\u064a\u0645\u0643 \u0628\u0639\u062f \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629','Thank you! Your review will appear after approval','Merci ! Votre avis sera publi\u00e9 apr\u00e8s validation'),'ok');
+      bpRvRating=0;bpRvPaint();var nme=document.getElementById('bpRvName'),bde=document.getElementById('bpRvBody'),f=document.getElementById('bpRvForm');if(nme)nme.value='';if(bde)bde.value='';setTimeout(function(){if(f)f.hidden=true;},2600);
+    }).catch(function(){set(rvL('\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644','Could not submit','Erreur'),'err');});}
+  (function(){var box=document.getElementById('bpRvStars');if(box)box.addEventListener('click',function(e){var sp=e.target.closest('span');if(!sp)return;bpRvRating=+sp.dataset.v||0;bpRvPaint();});
+    var tog=document.getElementById('bpRvToggle'),f=document.getElementById('bpRvForm');if(tog&&f)tog.addEventListener('click',function(){f.hidden=!f.hidden;if(!f.hidden){var n=document.getElementById('bpRvName');if(n)n.focus();}});
+    if(f)f.addEventListener('submit',function(e){e.preventDefault();bpRvSubmit();});})();
   document.getElementById('ppBack').addEventListener('click',function(){closeProduct();});
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&curProd)closeProduct();});
   document.querySelectorAll('.collection .ri-cta').forEach(c=>c.addEventListener('click',(e)=>{
@@ -2154,35 +2197,40 @@
       if(bundles.length&&bgrid){
         var idByUuid={},PRODID=window.__PRODID||{};for(var kk in PRODID){idByUuid[String(PRODID[kk])]=kk;}
         window.__BUNDLES=window.__BUNDLES||{};window.__BYSLUGB=window.__BYSLUGB||{};
-        bgrid.innerHTML='';
+        var BLIST=[];
         bundles.forEach(function(b){
           var rids=b.product_ids.map(function(u){return idByUuid[String(u)];}).filter(Boolean).slice(0,3);
           if(rids.length<3)return;
-          var slug=b.slug||b.id;
-          var price=(b.price_amount!=null?Number(b.price_amount):0);
-          window.__BUNDLES[b.id]={id:b.id,slug:slug,rids:rids,price:price,title:{fr:b.title_fr||'',en:b.title_en||'',ar:b.title_ar||''},subtitle:{fr:b.subtitle_fr||'',en:b.subtitle_en||'',ar:b.subtitle_ar||''}};
-          window.__BYSLUGB[slug]=b.id;
+          var slug=b.slug||b.id; var price=(b.price_amount!=null?Number(b.price_amount):0);
           var orig=0,soldout=false;
           rids.forEach(function(r){var a=(window.__PAMT&&window.__PAMT[r]);if(a)orig+=Number(a);var sk=(window.__PSTOCK&&window.__PSTOCK[r]);if(sk!=null&&sk<=0)soldout=true;});
-          var bn=(lang==='ar'?b.title_ar:(lang==='en'?b.title_en:b.title_fr))||b.title_fr||b.title_ar||'';
-          var bs=(lang==='ar'?b.subtitle_ar:(lang==='en'?b.subtitle_en:b.subtitle_fr))||'';
-          var cur=(lang==='ar'?'ر.س':'SAR');
-          var minis=rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||window.__DEFIMG||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
-          var priceHtml='<span class="ri-price">'+price+' '+cur+(orig>price?' <s>'+orig+' '+cur+'</s>':'')+'</span>';
-          var card=document.createElement('div');
-          card.className='col-card bundle-card reveal'+(soldout?' sold-out':'');
-          card.setAttribute('data-bundle',b.id);
-          card.innerHTML='<span class="cc-cnr tl"></span><span class="cc-cnr tr"></span><span class="cc-cnr bl"></span><span class="cc-cnr br"></span>'+
-            '<div class="bundle-stage">'+minis+'</div>'+
-            '<p class="ri-type">'+(lang==='ar'?'طقم · عرض':(lang==='en'?'Set · Offer':'Coffret · Offre'))+'</p>'+
-            '<h3 class="ri-name">'+bn+'</h3>'+
-            '<p class="ri-desc">'+bs+'</p>'+
-            '<div class="cc-foot">'+priceHtml+'<span class="ri-cta" data-i18n="cta.bundle">'+(lang==='ar'?'اكتشف الطقم':'Découvrir')+'</span></div>';
-          if(soldout){var so=document.createElement('span');so.className='cc-sold';so.setAttribute('data-i18n','stock.out');so.textContent=(lang==='ar'?'نفد':(lang==='en'?'Sold out':'Épuisé'));card.appendChild(so);}
-          card.addEventListener('click',function(e){e.preventDefault();if(window.__openBundle)window.__openBundle(b.id);});
-          bgrid.appendChild(card);
-          if(io)io.observe(card);else card.classList.add('in');
+          var rec={id:b.id,slug:slug,rids:rids,price:price,orig:orig,soldout:soldout,title:{fr:b.title_fr||'',en:b.title_en||'',ar:b.title_ar||''},subtitle:{fr:b.subtitle_fr||'',en:b.subtitle_en||'',ar:b.subtitle_ar||''}};
+          window.__BUNDLES[b.id]=rec; window.__BYSLUGB[slug]=b.id; BLIST.push(rec);
         });
+        window.__BUNDLELIST=BLIST;
+        window.__renderBundleCards=function(){
+          var g=document.getElementById('bundleGrid'); if(!g)return; var lg=(typeof lang!=='undefined'?lang:'fr'); g.innerHTML='';
+          (window.__BUNDLELIST||[]).forEach(function(rec){
+            var cur=(lg==='ar'?'ر.س':'SAR');
+            var bn=rec.title[lg]||rec.title.fr||rec.title.ar||'';
+            var bs=rec.subtitle[lg]||rec.subtitle.fr||'';
+            var minis=rec.rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||window.__DEFIMG||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
+            var priceHtml='<span class="ri-price">'+rec.price+' '+cur+(rec.orig>rec.price?' <s>'+rec.orig+' '+cur+'</s>':'')+'</span>';
+            var card=document.createElement('div');
+            card.className='col-card bundle-card reveal in'+(rec.soldout?' sold-out':'');
+            card.setAttribute('data-bundle',rec.id);
+            card.innerHTML='<span class="cc-cnr tl"></span><span class="cc-cnr tr"></span><span class="cc-cnr bl"></span><span class="cc-cnr br"></span>'+
+              '<div class="bundle-stage">'+minis+'</div>'+
+              '<p class="ri-type">'+(lg==='ar'?'طقم · عرض':(lg==='en'?'Set · Offer':'Coffret · Offre'))+'</p>'+
+              '<h3 class="ri-name">'+bn+'</h3>'+
+              '<p class="ri-desc">'+bs+'</p>'+
+              '<div class="cc-foot">'+priceHtml+'<span class="ri-cta">'+(lg==='ar'?'اكتشف الطقم':(lg==='en'?'Discover the set':'Découvrir le coffret'))+'</span></div>';
+            if(rec.soldout){var so=document.createElement('span');so.className='cc-sold';so.textContent=(lg==='ar'?'نفد':(lg==='en'?'Sold out':'Épuisé'));card.appendChild(so);}
+            card.addEventListener('click',function(e){e.preventDefault();if(window.__openBundle)window.__openBundle(rec.id);});
+            g.appendChild(card);
+          });
+        };
+        window.__renderBundleCards();
         if(offers)offers.hidden=false;
       }
     }catch(e){}
