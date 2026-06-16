@@ -461,6 +461,11 @@
   .news-form button{background:transparent;border:1px solid var(--line);border-radius:2px;padding:13px 24px;font-family:var(--label);text-transform:uppercase;letter-spacing:.2em;font-size:10px;cursor:pointer;color:var(--gold-soft);white-space:nowrap;transition:all .4s}
   [dir=rtl] .news-form button{font-family:var(--ar-label);text-transform:none;letter-spacing:0;font-size:13px}
   .news-form button:hover{border-color:var(--gold);color:var(--gold);background:rgba(199,162,74,.08)}
+  .news-msg{min-height:20px;margin:16px auto 0;max-width:500px;font-size:.95rem;text-align:center;opacity:0;transition:opacity .4s}
+  .news-msg.show{opacity:1}
+  .news-msg.ok{color:var(--gold-soft)}
+  .news-msg.bad{color:#e79bab}
+  [dir=rtl] .news-msg{font-family:var(--ar-body)}
 
   /* FOOTER */
   footer{padding:90px 5vw 36px;background:var(--noir);border-top:1px solid var(--line)}
@@ -1204,10 +1209,11 @@
     <h2 data-i18n="news.h2">Entrez dans le <em>cercle privé</em></h2>
     <div class="story-orn"><span>&#9670;</span></div>
     <p data-i18n="news.p">Lancements confidentiels, soirées sur invitation et l'art du parfum de nuit, réservés à nos initiés.</p>
-    <form class="news-form" onsubmit="return false">
-      <input type="email" data-i18n-ph="news.ph" placeholder="Votre adresse e-mail" required>
-      <button type="submit" data-i18n="news.btn">Rejoindre →</button>
+    <form class="news-form" id="newsForm" onsubmit="return false">
+      <input type="email" id="newsEmail" data-i18n-ph="news.ph" placeholder="Votre adresse e-mail" required>
+      <button type="submit" id="newsBtn" data-i18n="news.btn">Rejoindre →</button>
     </form>
+    <p class="news-msg" id="newsMsg" aria-live="polite"></p>
   </div>
 </section>
 
@@ -2314,6 +2320,45 @@
     var c=e.target.closest&&e.target.closest('[data-aropen]'); if(c){e.preventDefault();var sg=decodeURIComponent(c.getAttribute('data-aropen'));openArticle(sg);return;}});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(window.__articleSlug)closeArticle();else if(window.__journalOpen)closeJournal();}});
   try{if(window.applyRoute)window.applyRoute();}catch(e){}
+})();
+</script>
+<!-- ===== Newsletter (Le Cercle) — saves subscribers to Supabase ===== -->
+<script>
+(function(){
+  var form=document.getElementById('newsForm');
+  if(!form) return;
+  var input=document.getElementById('newsEmail');
+  var btn=document.getElementById('newsBtn');
+  var msg=document.getElementById('newsMsg');
+  function L(ar,en,fr){var l=document.documentElement.lang;return l==='ar'?ar:(l==='en'?en:fr);}
+  function say(text,ok){if(!msg)return;msg.textContent=text;msg.className='news-msg show '+(ok?'ok':'bad');}
+  function valid(e){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);}
+  function submit(){
+    var email=(input&&input.value||'').trim().toLowerCase();
+    if(!valid(email)){say(L('أدخل بريدًا إلكترونيًا صحيحًا.','Please enter a valid email.','Veuillez saisir un e-mail valide.'),false);if(input)input.focus();return;}
+    var sb=window.__sb;
+    if(!sb){say(L('تعذّر الاتصال، حاول لاحقًا.','Connection error, please try again.','Erreur de connexion, réessayez.'),false);return;}
+    if(btn){btn.disabled=true;}
+    var sending=L('جارٍ الإرسال…','Sending…','Envoi…');say(sending,true);
+    sb.from('subscribers').insert({email:email,lang:document.documentElement.lang,source:'site',status:'subscribed'}).then(function(r){
+      if(btn){btn.disabled=false;}
+      if(r&&r.error){
+        var c=r.error.code,m=(r.error.message||'').toLowerCase();
+        if(c==='23505'||m.indexOf('duplicate')>-1||m.indexOf('unique')>-1){
+          say(L('أنت بالفعل من أعضاء الدائرة 🌙','You are already in the circle 🌙','Vous faites déjà partie du cercle 🌙'),true);
+          if(input)input.value='';
+        } else {
+          say(L('تعذّر الاشتراك، حاول لاحقًا.','Could not subscribe, please try again.','Inscription impossible, réessayez.'),false);
+        }
+        return;
+      }
+      if(input)input.value='';
+      say(L('أهلًا بك في دائرة CHATTLLE الخاصة ✦','Welcome to the CHATTLLE inner circle ✦','Bienvenue dans le cercle privé CHATTLLE ✦'),true);
+      try{if(window.gtag)window.gtag('event','newsletter_signup',{method:'site'});}catch(e){}
+    });
+  }
+  form.addEventListener('submit',function(e){e.preventDefault();submit();});
+  if(btn)btn.addEventListener('click',function(e){e.preventDefault();submit();});
 })();
 </script>
 </body>
