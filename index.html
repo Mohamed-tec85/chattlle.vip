@@ -1725,7 +1725,7 @@
   function fillBundle(id){var b=window.__BUNDLES&&window.__BUNDLES[id]; if(!b)return; var d=I18N[lang]||{}; var cur=(lang==='ar'?'ر.س':'SAR');
     var nmEl=document.getElementById('bpName'); if(nmEl)nmEl.innerHTML=b.title[lang]||b.title.fr||'';
     var dsEl=document.getElementById('bpDesc'); if(dsEl)dsEl.textContent=b.subtitle[lang]||b.subtitle.fr||'';
-    var stage=document.getElementById('bpStage'); if(stage)stage.innerHTML=b.rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
+    var stage=document.getElementById('bpStage'); if(stage)stage.innerHTML=b.rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||window.__DEFIMG||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
     var orig=0,soldout=false; var listEl=document.getElementById('bpList');
     var rowsHtml=b.rids.map(function(r){var nm=(d[r+'.name']||(window.__PNAME&&window.__PNAME[r])||'').replace(/<[^>]*>/g,'');var ty=(d[r+'.type']||'').replace(/<[^>]*>/g,'');var a=(window.__PAMT&&window.__PAMT[r]);if(a)orig+=Number(a);var sk=(window.__PSTOCK&&window.__PSTOCK[r]);if(sk!=null&&sk<=0)soldout=true;return '<div class="bp-item"><span><span class="bp-nm">'+nm+'</span><span class="bp-ty">'+ty+'</span></span><span class="bp-pr">'+(a?(a+' '+cur):'')+'</span></div>';}).join('');
     if(listEl)listEl.innerHTML=rowsHtml;
@@ -2062,7 +2062,7 @@
     if(!grid || typeof I18N==='undefined' || typeof applyLang!=='function') return;
 
     function toRoman(n){const m=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let r='';for(let k=0;k<m.length;k++){while(n>=m[k][0]){r+=m[k][1];n-=m[k][0];}}return r;}
-    const DEF=(typeof BOTTLE_SRC!=='undefined')?BOTTLE_SRC:'';
+    const DEF=(typeof BOTTLE_SRC!=='undefined')?BOTTLE_SRC:'';window.__DEFIMG=DEF;
     const io=('IntersectionObserver' in window)? new IntersectionObserver(function(ents){ents.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.12}) : null;
 
     grid.innerHTML='';
@@ -2167,7 +2167,7 @@
           var bn=(lang==='ar'?b.title_ar:(lang==='en'?b.title_en:b.title_fr))||b.title_fr||b.title_ar||'';
           var bs=(lang==='ar'?b.subtitle_ar:(lang==='en'?b.subtitle_en:b.subtitle_fr))||'';
           var cur=(lang==='ar'?'ر.س':'SAR');
-          var minis=rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
+          var minis=rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||window.__DEFIMG||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
           var priceHtml='<span class="ri-price">'+price+' '+cur+(orig>price?' <s>'+orig+' '+cur+'</s>':'')+'</span>';
           var card=document.createElement('div');
           card.className='col-card bundle-card reveal'+(soldout?' sold-out':'');
