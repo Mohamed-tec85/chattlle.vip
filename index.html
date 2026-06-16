@@ -941,6 +941,13 @@
   .bp-item .bp-pr{color:var(--gold-soft);white-space:nowrap}
   .bp-save{margin:8px 0 2px;color:#6fcf97;font-size:15px}
   @media(max-width:860px){.bundle-stage-lg{height:220px}.bundle-stage-lg .bmini img{height:146px}.bundle-stage-lg .bmini:nth-child(2) img{height:176px}}
+  /* mobile: bundle card shows all three bottles fitted to the card width */
+  @media(max-width:600px){
+    .bundle-stage:not(.bundle-stage-lg){height:auto;gap:6px;padding:0 2px}
+    .bundle-stage:not(.bundle-stage-lg) .bmini{flex:1 1 0;min-width:0}
+    .bundle-stage:not(.bundle-stage-lg) .bmini img{width:100%;height:auto;max-height:170px}
+    .bundle-stage:not(.bundle-stage-lg) .bmini:nth-child(2){transform:scale(1.13);transform-origin:bottom center;z-index:2}
+  }
 </style>
 <script type="application/ld+json">
 [
