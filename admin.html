@@ -373,7 +373,7 @@ $('#loginBtn').addEventListener('click',async()=>{
   $('#loginBtn').disabled=true; $('#loginBtn').textContent='جاري الدخول...';
   const { error }=await supabase.auth.signInWithPassword({ email, password });
   $('#loginBtn').disabled=false; $('#loginBtn').textContent='تسجيل الدخول';
-  if(error){ msg.textContent='فشل الدخول: تأكد من البيانات'; msg.className='msg err'; return; }
+  if(error){ msg.textContent='فشل الدخول: '+(error.message||'تأكد من البيانات'); msg.className='msg err'; return; }
   showApp(true);
 });
 $('#logoutBtn').addEventListener('click',async()=>{ await supabase.auth.signOut(); showApp(false); });
