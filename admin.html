@@ -533,6 +533,7 @@ function panelFor(p){
         <div><label>الترتيب (الرقم)</label><input type="number" data-field="sort_order" value="${p.sort_order??0}"></div>
         <div><label>المخزون (الكمية)</label><input type="number" min="0" data-field="stock" value="${p.stock??''}" placeholder="فارغ = غير محدود"></div>
         <div class="chk"><input type="checkbox" data-field="active" ${p.active?'checked':''}><span>ظاهر في الموقع</span></div>
+        <div class="chk"><input type="checkbox" data-field="bestseller" ${p.bestseller?'checked':''}><span>⭐ ضمن «الأكثر مبيعاً»</span></div>
       </div>
       <div class="lang-grid">${cols}</div>
       <div class="save-row"><button class="btn-gold" data-save>حفظ التغييرات</button>
