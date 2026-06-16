@@ -864,6 +864,15 @@
   .cc-cnr.bl{bottom:10px;left:10px;border-right:0;border-top:0}
   .cc-cnr.br{bottom:10px;right:10px;border-left:0;border-top:0}
   @media(max-width:760px){.col-card>.cc-cnr{width:14px;height:14px}.cc-cnr.tl{top:6px;left:6px}.cc-cnr.tr{top:6px;right:6px}.cc-cnr.bl{bottom:6px;left:6px}.cc-cnr.br{bottom:6px;right:6px}}
+  /* «مجموعة CHATTLLE» cards: gold corner brackets (CSS-drawn, 4 corners) */
+  #collection .col-card::after{content:"";position:absolute;inset:10px;pointer-events:none;z-index:3;
+    background:
+      linear-gradient(var(--gold-soft),var(--gold-soft)) left top/18px 2px no-repeat,linear-gradient(var(--gold-soft),var(--gold-soft)) left top/2px 18px no-repeat,
+      linear-gradient(var(--gold-soft),var(--gold-soft)) right top/18px 2px no-repeat,linear-gradient(var(--gold-soft),var(--gold-soft)) right top/2px 18px no-repeat,
+      linear-gradient(var(--gold-soft),var(--gold-soft)) left bottom/18px 2px no-repeat,linear-gradient(var(--gold-soft),var(--gold-soft)) left bottom/2px 18px no-repeat,
+      linear-gradient(var(--gold-soft),var(--gold-soft)) right bottom/18px 2px no-repeat,linear-gradient(var(--gold-soft),var(--gold-soft)) right bottom/2px 18px no-repeat;
+    filter:drop-shadow(0 0 6px rgba(199,162,74,.5))}
+  @media(max-width:760px){#collection .col-card::after{inset:6px;background-size:12px 2px,2px 12px,12px 2px,2px 12px,12px 2px,2px 12px,12px 2px,2px 12px}}
   /* feature top video (blends into the site background) */
   .feat-video{max-width:780px;margin:0 auto 72px;padding:0 16px}
   .feat-video-el{width:100%;height:auto;display:block;mix-blend-mode:lighten;
