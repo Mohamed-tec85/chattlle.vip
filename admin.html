@@ -581,7 +581,7 @@ function bundlePanel(b,products){
   const d=document.createElement('details'); d.className='prod';
   const pid=Array.isArray(b.product_ids)?b.product_ids:[];
   const opts=(sel)=>['<option value="">— اختر عطراً —</option>'].concat(products.map(p=>`<option value="${p.id}"${sel===p.id?' selected':''}>${(p.name_ar||p.name_fr||p.id)}</option>`)).join('');
-  const langCols=LANGS.map(([c,lbl])=>`<div class="lang-col"><h4>${lbl}</h4><label>العنوان</label><input type="text" data-bfield="title_${c}" value="${(b['title_'+c]||'').replace(/"/g,'&quot;')}"><label>وصف قصير</label><input type="text" data-bfield="subtitle_${c}" value="${(b['subtitle_'+c]||'').replace(/"/g,'&quot;')}"></div>`).join('');
+  const langCols=LANGS.map(([c,lbl])=>`<div class="lang-col"><h4>${lbl}</h4><label>العنوان</label><input type="text" data-bfield="title_${c}" value="${(b['title_'+c]||'').replace(/"/g,'&quot;')}"><label>وصف قصير (يظهر في الكرت)</label><input type="text" data-bfield="subtitle_${c}" value="${(b['subtitle_'+c]||'').replace(/"/g,'&quot;')}"><label>وصف صفحة الطقم (تفصيلي)</label><textarea data-bfield="description_${c}" style="min-height:90px">${(b['description_'+c]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea></div>`).join('');
   d.innerHTML=`
     <summary>
       <div><div class="sum-name">${b.title_ar||b.title_fr||'(عرض بلا عنوان)'} ${b.active?'':'<span class="badge-off">مخفي</span>'}${(pid.filter(Boolean).length<3)?' <span class="badge-off" style="border-color:#caa45a;color:#caa45a">يحتاج ٣ عطور</span>':''}</div>

@@ -1769,7 +1769,7 @@
   function bpPath(id){var b=window.__BUNDLES&&window.__BUNDLES[id];return '/offre/'+((b&&b.slug)||id);}
   function fillBundle(id){var b=window.__BUNDLES&&window.__BUNDLES[id]; if(!b)return; var d=I18N[lang]||{}; var cur=(lang==='ar'?'ر.س':'SAR');
     var nmEl=document.getElementById('bpName'); if(nmEl)nmEl.innerHTML=b.title[lang]||b.title.fr||'';
-    var dsEl=document.getElementById('bpDesc'); if(dsEl)dsEl.textContent=b.subtitle[lang]||b.subtitle.fr||'';
+    var dsEl=document.getElementById('bpDesc'); if(dsEl)dsEl.textContent=(b.description&&(b.description[lang]||b.description.fr))||b.subtitle[lang]||b.subtitle.fr||'';
     var stage=document.getElementById('bpStage'); if(stage)stage.innerHTML=b.rids.map(function(r){var img=((window.__PIMG&&window.__PIMG[r])||window.__DEFIMG||'').replace(/"/g,'&quot;');return '<div class="bmini"><img class="cc-bottle" alt="" src="'+img+'"></div>';}).join('');
     var orig=0,soldout=false; var listEl=document.getElementById('bpList');
     var rowsHtml=b.rids.map(function(r){var nm=(d[r+'.name']||(window.__PNAME&&window.__PNAME[r])||'').replace(/<[^>]*>/g,'');var ty=(d[r+'.type']||'').replace(/<[^>]*>/g,'');var a=(window.__PAMT&&window.__PAMT[r]);if(a)orig+=Number(a);var sk=(window.__PSTOCK&&window.__PSTOCK[r]);if(sk!=null&&sk<=0)soldout=true;return '<div class="bp-item"><span><span class="bp-nm">'+nm+'</span><span class="bp-ty">'+ty+'</span></span><span class="bp-pr">'+(a?(a+' '+cur):'')+'</span></div>';}).join('');
@@ -2236,7 +2236,7 @@
           var slug=b.slug||b.id; var price=(b.price_amount!=null?Number(b.price_amount):0);
           var orig=0,soldout=false;
           rids.forEach(function(r){var a=(window.__PAMT&&window.__PAMT[r]);if(a)orig+=Number(a);var sk=(window.__PSTOCK&&window.__PSTOCK[r]);if(sk!=null&&sk<=0)soldout=true;});
-          var rec={id:b.id,slug:slug,rids:rids,price:price,orig:orig,soldout:soldout,title:{fr:b.title_fr||'',en:b.title_en||'',ar:b.title_ar||''},subtitle:{fr:b.subtitle_fr||'',en:b.subtitle_en||'',ar:b.subtitle_ar||''}};
+          var rec={id:b.id,slug:slug,rids:rids,price:price,orig:orig,soldout:soldout,title:{fr:b.title_fr||'',en:b.title_en||'',ar:b.title_ar||''},subtitle:{fr:b.subtitle_fr||'',en:b.subtitle_en||'',ar:b.subtitle_ar||''},description:{fr:b.description_fr||'',en:b.description_en||'',ar:b.description_ar||''}};
           window.__BUNDLES[b.id]=rec; window.__BYSLUGB[slug]=b.id; BLIST.push(rec);
         });
         window.__BUNDLELIST=BLIST;
