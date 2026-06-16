@@ -193,6 +193,16 @@
     <div id="view-bundles" class="hidden">
       <div class="toolbar"><h2>عروض الأطقم</h2><button class="btn-gold" id="addBundle">➕ إضافة عرض</button></div>
       <div class="hint">كل عرض = ٣ عطور من قائمتك تُباع معاً بسعر موفّر. اختر العطور الثلاثة، حدّد سعر العرض، واكتب عنواناً بكل لغة. يظهر العرض في الموقع ضمن قسم «الأطقم» بثلاث زجاجات. لا يظهر إلا عند تفعيل «ظاهر في الموقع» واختيار ٣ عطور.</div>
+      <div class="card" style="margin-bottom:18px">
+        <h3>عنوان قسم العروض في الموقع</h3>
+        <div class="lang-grid">
+          <div class="lang-col"><h4>Français</h4><label>الشارة (فوق العنوان)</label><input type="text" data-olabel="fr"><label>العنوان الرئيسي</label><textarea data-oh2="fr"></textarea></div>
+          <div class="lang-col"><h4>English</h4><label>الشارة (فوق العنوان)</label><input type="text" data-olabel="en"><label>العنوان الرئيسي</label><textarea data-oh2="en"></textarea></div>
+          <div class="lang-col"><h4>العربية</h4><label>الشارة (فوق العنوان)</label><input type="text" data-olabel="ar"><label>العنوان الرئيسي</label><textarea data-oh2="ar"></textarea></div>
+        </div>
+        <div class="hint">الشارة هي النص الصغير فوق العنوان (مثل «أطقم CHATTLLE»). العنوان الرئيسي مثل «ثلاثيات بسعر العرض» — ويمكنك إبراز كلمة بالخط المائل بوضعها بين وسمَي em.</div>
+        <div class="save-row"><button class="btn-gold" id="saveOffersHead">حفظ عنوان العروض</button><span class="status" id="offersHeadStatus"></span></div>
+      </div>
       <div id="bundlesList"></div>
     </div>
 
@@ -354,7 +364,7 @@ async function init(){ const { data:{session} }=await supabase.auth.getSession()
 function showApp(on){
   $('#login').style.display=on?'none':'block';
   $('#app').style.display=on?'block':'none';
-  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadPages(); loadOrders(); loadShipping(); loadPromos(); loadPromoBanner(); loadBundles(); }
+  if(on){ loadDashboard(); loadProducts(); loadHeading(); loadOffersHead(); loadPages(); loadOrders(); loadShipping(); loadPromos(); loadPromoBanner(); loadBundles(); }
 }
 $('#loginBtn').addEventListener('click',async()=>{
   const msg=$('#loginMsg'); msg.textContent=''; msg.className='msg';
@@ -458,6 +468,23 @@ async function loadHeading(){
   const { data }=await supabase.from('settings').select('*').eq('key','col_h2').maybeSingle();
   if(data){ document.querySelectorAll('[data-setting]').forEach(el=>{ el.value=data[el.dataset.setting]||''; }); }
 }
+async function loadOffersHead(){
+  const { data }=await supabase.from('settings').select('*').in('key',['offers_label','offers_h2']);
+  const m={}; (data||[]).forEach(r=>{m[r.key]=r;});
+  document.querySelectorAll('[data-olabel]').forEach(el=>{ el.value=(m['offers_label']&&m['offers_label']['value_'+el.dataset.olabel])||''; });
+  document.querySelectorAll('[data-oh2]').forEach(el=>{ el.value=(m['offers_h2']&&m['offers_h2']['value_'+el.dataset.oh2])||''; });
+}
+$('#saveOffersHead')&&$('#saveOffersHead').addEventListener('click',async()=>{
+  const st=$('#offersHeadStatus'); st.textContent='جاري الحفظ...'; st.style.color='var(--muted)';
+  const lbl={key:'offers_label',updated_at:new Date().toISOString()};
+  document.querySelectorAll('[data-olabel]').forEach(el=>{ lbl['value_'+el.dataset.olabel]=el.value; });
+  const h2={key:'offers_h2',updated_at:new Date().toISOString()};
+  document.querySelectorAll('[data-oh2]').forEach(el=>{ h2['value_'+el.dataset.oh2]=el.value; });
+  const r1=await supabase.from('settings').upsert(lbl,{onConflict:'key'});
+  const r2=await supabase.from('settings').upsert(h2,{onConflict:'key'});
+  if(r1.error||r2.error){ st.textContent='خطأ: '+((r1.error||r2.error).message); st.style.color='#e79bab'; return; }
+  st.textContent='✓ تم الحفظ'; st.style.color='var(--emerald)'; setTimeout(()=>st.textContent='',2500);
+});
 $('#saveHeading').addEventListener('click',async()=>{
   const st=$('#headingStatus'); st.textContent='جاري الحفظ...'; st.style.color='var(--muted)';
   const payload={key:'col_h2',updated_at:new Date().toISOString()};
