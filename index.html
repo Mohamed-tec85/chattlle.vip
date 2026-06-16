@@ -2214,6 +2214,7 @@
     }
     (function(){
       var bestProds=active.filter(function(p){return p.bestseller;});
+      try{console.log('CHATTLLE build v2 — bestsellers count:', bestProds.length, bestProds.map(function(p){return p.id;}));}catch(e){}
       var tpl=document.querySelector('.best-card');
       var bestGrid=tpl?tpl.closest('.col-grid'):null;
       var bestSec=document.getElementById('feature');
