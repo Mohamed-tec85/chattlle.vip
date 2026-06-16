@@ -2216,7 +2216,9 @@
       var bestProds=active.filter(function(p){return p.bestseller;});
       var tpl=document.querySelector('.best-card');
       var bestGrid=tpl?tpl.closest('.col-grid'):null;
-      if(bestProds.length && bestGrid && tpl){
+      var bestSec=document.getElementById('feature');
+      if(bestGrid && tpl && bestProds.length){
+        if(bestSec) bestSec.style.display='';
         var clean=tpl.cloneNode(true);
         bestGrid.innerHTML='';
         bestProds.forEach(function(p){
@@ -2231,9 +2233,8 @@
           bestGrid.appendChild(bc);
         });
         if(typeof applyLang==='function') applyLang(document.documentElement.lang||'fr');
-      } else {
-        featureCard('feat.name','r1');
-        featureCard('r4.name','r4');
+      } else if(bestGrid && tpl){
+        if(bestSec) bestSec.style.display='none';
       }
     })();
 
