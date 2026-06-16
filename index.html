@@ -2219,7 +2219,6 @@
       if(!tpl||!bestGrid){ return; }
       var list=[];
       active.forEach(function(p,i){ if(p.bestseller) list.push({rid:'r'+(i+1),roman:toRoman(i+1)}); });
-      try{console.log('CHATTLLE build v3 — bestsellers:', list.map(function(x){return x.rid;}));}catch(e){}
       if(!list.length){ if(bestSec) bestSec.style.display='none'; return; }
       if(bestSec) bestSec.style.display='';
       var clean=tpl.cloneNode(true);
