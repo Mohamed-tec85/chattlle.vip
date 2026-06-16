@@ -581,7 +581,7 @@
       radial-gradient(115% 85% at 50% -12%,rgba(245,228,176,.17),rgba(199,162,74,.05) 38%,transparent 62%),
       linear-gradient(160deg,rgba(24,34,28,.6),rgba(8,12,10,.55));
     border-top:2px solid #efd98c;border-left:2px solid #d8b35e;border-right:2px solid #8f6e2a;border-bottom:2px solid #6e521f;
-    box-shadow:0 30px 56px rgba(0,0,0,.55),inset 0 1px 0 rgba(245,228,176,.25),inset 0 -34px 54px rgba(0,0,0,.38),inset 0 0 50px rgba(199,162,74,.05)}
+    box-shadow:0 30px 56px rgba(0,0,0,.55),inset 0 1px 0 rgba(245,228,176,.25),inset 0 -34px 54px rgba(0,0,0,.38),inset 0 0 50px rgba(199,162,74,.05);animation:frameNeon 3.4s ease-in-out infinite}
   .coll-frame::before{content:"";position:absolute;inset:9px;border:1px solid rgba(199,162,74,.3);border-radius:2px;pointer-events:none}
   .coll-frame::after{content:"";position:absolute;left:5px;right:5px;bottom:-8px;height:8px;border-radius:0 0 4px 4px;z-index:-1;
     background:linear-gradient(180deg,#7a5d23,#2c2110)}
@@ -599,6 +599,12 @@
   [dir=rtl] .coll-frame h2{font-family:"Amiri",serif;font-weight:700;line-height:1.5}
   @media(max-width:560px){.coll-frame h2{white-space:normal;font-size:1.3rem}}
   @media(max-width:620px){.coll-frame{padding:46px 24px 34px}.coll-frame .label{letter-spacing:.2em;font-size:10px;padding:8px 18px}}
+  /* gold LED neon glow for section-heading frames (keeps original depth shadows) */
+  @keyframes frameNeon{
+    0%,100%{box-shadow:0 0 10px rgba(224,201,132,.22),0 0 24px rgba(199,162,74,.10),0 30px 56px rgba(0,0,0,.55),inset 0 1px 0 rgba(245,228,176,.25),inset 0 -34px 54px rgba(0,0,0,.38),inset 0 0 50px rgba(199,162,74,.05)}
+    50%{box-shadow:0 0 24px rgba(224,201,132,.62),0 0 52px rgba(199,162,74,.34),0 30px 56px rgba(0,0,0,.55),inset 0 1px 0 rgba(245,228,176,.25),inset 0 -34px 54px rgba(0,0,0,.38),inset 0 0 50px rgba(199,162,74,.08)}
+  }
+  @media(prefers-reduced-motion:reduce){.coll-frame{animation:none}}
   /* ===== Cart drawer ===== */
   .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:opacity .4s ease;z-index:3500}
   .cart-overlay.open{opacity:1;visibility:visible}
