@@ -878,6 +878,12 @@
       linear-gradient(var(--gold-soft),var(--gold-soft)) right bottom/18px 2px no-repeat,linear-gradient(var(--gold-soft),var(--gold-soft)) right bottom/2px 18px no-repeat;
     filter:drop-shadow(0 0 6px rgba(199,162,74,.5))}
   @media(max-width:760px){#collection .col-card::after{inset:6px;background-size:12px 2px,2px 12px,12px 2px,2px 12px,12px 2px,2px 12px,12px 2px,2px 12px}}
+  /* external card rating badge (social proof) */
+  .cc-rating{display:flex;align-items:center;justify-content:center;gap:7px;margin:0 0 12px;position:relative;z-index:1}
+  .cc-rating-stars{color:var(--gold-soft);letter-spacing:2px;font-size:14px;line-height:1;text-shadow:0 0 8px rgba(199,162,74,.5)}
+  .cc-rating-num{color:#f3e8c8;font-weight:600;font-size:13px}
+  .cc-rating-count{color:var(--muted);font-size:12px}
+  @media(max-width:760px){.cc-rating-stars{font-size:13px;letter-spacing:1.5px}}
   /* feature top video (blends into the site background) */
   .feat-video{max-width:1400px;margin:0 auto 72px;padding:0 16px}
   .feat-video-el{width:100%;height:auto;display:block;mix-blend-mode:lighten;
@@ -2245,13 +2251,26 @@
 
     try{ const ss=await sb.from('settings').select('*'); if(ss&&ss.data){ const SM={}; ss.data.forEach(function(r){SM[r.key]=r;}); if(SM['col_h2']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['col_h2']['value_'+l]) I18N[l]['col.h2']=SM['col_h2']['value_'+l]; }); } if(SM['offers_label']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['offers_label']['value_'+l]) I18N[l]['offers.label']=SM['offers_label']['value_'+l]; }); } if(SM['offers_h2']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['offers_h2']['value_'+l]) I18N[l]['offers.h2']=SM['offers_h2']['value_'+l]; }); } if(SM['shipping']){ window.__SHIP={cost:Number(SM['shipping'].value_fr)||0, freeOver:Number(SM['shipping'].value_en)||0}; } if(SM['promo_banner']){ ['fr','en','ar'].forEach(function(l){ if(I18N[l]&&SM['promo_banner']['value_'+l]) I18N[l]['pbanner.text']=SM['promo_banner']['value_'+l]; }); } var _pbc=SM['promo_banner_cfg']; var _pse=document.getElementById('promoSpray'),_psp=document.getElementById('promoSprayPill'); if(_pse){ _pse.style.display=(!_pbc||_pbc.value_en!=='0')?'':'none'; } if(_psp&&_pbc){ if(_pbc.value_fr){_psp.textContent=_pbc.value_fr;_psp.style.display='';}else{_psp.style.display='none';} } try{var _code=(_pbc&&_pbc.value_fr)?_pbc.value_fr:'WELCOME';document.querySelectorAll('.mqCode').forEach(function(e){e.textContent=_code;});var _fo=(window.__SHIP&&window.__SHIP.freeOver)?window.__SHIP.freeOver:500;document.querySelectorAll('.mqShipAmt').forEach(function(e){e.textContent=_fo;});}catch(_e){} } }catch(e){}
     (function(){try{var sb=window.__sb;if(!sb)return;
+      function ccStars(n){var s='';for(var i=1;i<=5;i++){s+=(i<=n?'\u2605':'\u2606');}return s;}
+      function paintCardRatings(){var RAT=window.__RATINGS||{};var pairs=[];
+        document.querySelectorAll('#collection .col-card[data-prod]').forEach(function(c){pairs.push([c,c.getAttribute('data-prod')]);});
+        document.querySelectorAll('#feature .best-card').forEach(function(c){var a=c.querySelector('[data-open]');if(a)pairs.push([c,a.getAttribute('data-open')]);});
+        pairs.forEach(function(pr){var card=pr[0],rid=pr[1];if(!rid)return;var rt=RAT[rid];var old=card.querySelector('.cc-rating');if(old&&old.parentNode)old.parentNode.removeChild(old);if(!rt||!rt.count)return;
+          var b=document.createElement('div');b.className='cc-rating';
+          b.innerHTML='<span class="cc-rating-stars" aria-hidden="true">'+ccStars(Math.round(rt.avg))+'</span><span class="cc-rating-num">'+rt.avg.toFixed(1)+'</span><span class="cc-rating-count">('+rt.count+')</span>';
+          var nameEl=card.querySelector('.ri-name'),footEl=card.querySelector('.cc-foot');
+          if(nameEl&&nameEl.parentNode){nameEl.parentNode.insertBefore(b,nameEl.nextSibling);}else if(footEl&&footEl.parentNode){footEl.parentNode.insertBefore(b,footEl);}else{card.appendChild(b);}
+        });}
+      window.__paintCardRatings=paintCardRatings;
       sb.from('reviews').select('product_ref,author,rating,body').eq('status','approved').then(function(r){
         var rows=(r&&r.data)||[];if(!rows.length)return;
         var byRef={};rows.forEach(function(x){(byRef[x.product_ref]=byRef[x.product_ref]||[]).push(x);});
         var idByRef={},pid=window.__PRODID||{};for(var k in pid){idByRef[String(pid[k])]=k;}
+        var RAT=window.__RATINGS=window.__RATINGS||{};
         var graph=[];for(var ref in byRef){var arr=byRef[ref],rid=idByRef[ref];if(!rid)continue;
           var nm=(window.__PNAME&&window.__PNAME[rid])||'CHATTLLE',img=(window.__PIMG&&window.__PIMG[rid])||'',amt=(window.__PAMT&&window.__PAMT[rid]);
           var s=0;arr.forEach(function(x){s+=x.rating;});var avg=s/arr.length;
+          RAT[rid]={avg:avg,count:arr.length};
           var prod={"@type":"Product","name":nm,"brand":{"@type":"Brand","name":"CHATTLLE"},
             "url":((location&&location.origin)||"https://chattlle.vip")+"/produit/"+((window.__SLUG&&window.__SLUG[rid])?window.__SLUG[rid]:rid),
             "aggregateRating":{"@type":"AggregateRating","ratingValue":Number(avg.toFixed(1)),"reviewCount":arr.length,"bestRating":5,"worstRating":1},
@@ -2259,6 +2278,7 @@
           if(img)prod.image=img;
           if(amt!=null)prod.offers={"@type":"Offer","price":amt,"priceCurrency":"SAR","availability":"https://schema.org/InStock","url":prod.url};
           graph.push(prod);}
+        try{paintCardRatings();}catch(e){}
         if(!graph.length)return;
         var el=document.getElementById('rvLD');if(!el){el=document.createElement('script');el.type='application/ld+json';el.id='rvLD';document.head.appendChild(el);}
         el.textContent=JSON.stringify({"@context":"https://schema.org","@graph":graph});
